@@ -1,4 +1,12 @@
+
 export interface StoreState {
-    languageName: string;
-    enthusiasmLevel: number;
+    queryItems: DataItem[];
+    resultItems: DataItem[];
+}
+
+export interface DataItem {
+    type: string;
+    id: string;
+    name: string;
+    uri: string;
 }

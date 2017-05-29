@@ -3,3 +3,9 @@
     border-bottom: 2px solid #00BCD4;
     padding: 10px 0;
 }
+
+.SearchFilter__hd {
+    margin: 0;
+    margin-bottom: 0.2em;
+    font-size: 20px;
+}

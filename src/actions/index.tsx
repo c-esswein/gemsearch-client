@@ -1,23 +1,52 @@
 import * as constants from '../constants';
+import {DataItem} from '../types';
 
-export interface IncrementEnthusiasm {
-    type: constants.INCREMENT_ENTHUSIASM;
+export interface AddQueryItem {
+    type: constants.ADD_QUERY_ITEM;
+    item: DataItem;
 }
 
-export interface DecrementEnthusiasm {
-    type: constants.DECREMENT_ENTHUSIASM;
+export interface RemoveQueryItem {
+    type: constants.REMOVE_QUERY_ITEM;
+    item: DataItem;
 }
 
-export type EnthusiasmAction = IncrementEnthusiasm | DecrementEnthusiasm;
+export interface QueryForItems {
+    type: constants.QUERY_FOR_ITEMS;
+    query: DataItem[];
+}
 
-export function incrementEnthusiasm(): IncrementEnthusiasm {
+export interface RecieveItems {
+    type: constants.RECIEVE_ITEMS;
+    response: Object;
+}
+
+export type QueryAction = AddQueryItem | RemoveQueryItem | QueryForItems | RecieveItems;
+
+export function addQueryItem(item: DataItem): AddQueryItem {
     return {
-        type: constants.INCREMENT_ENTHUSIASM
-    }
+        type: constants.ADD_QUERY_ITEM,
+        item
+    };
 }
 
-export function decrementEnthusiasm(): DecrementEnthusiasm {
+export function removeQueryItem(item: DataItem): RemoveQueryItem {
     return {
-        type: constants.DECREMENT_ENTHUSIASM
-    }
+        type: constants.REMOVE_QUERY_ITEM,
+        item
+    };
+}
+
+export function queryForItems(query: DataItem[]): QueryForItems {
+    return {
+        type: constants.QUERY_FOR_ITEMS,
+        query
+    };
+}
+
+export function recieveItems(response: Object): RecieveItems {
+    return {
+        type: constants.RECIEVE_ITEMS,
+        response
+    };
 }

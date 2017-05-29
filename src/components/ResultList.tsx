@@ -1,18 +1,19 @@
 import * as React from 'react';
 import Item from './Item';
+import {DataItem} from '../types';
 /* import Artist from './Artist';
 import Song from './Song'; */
 
 import './ResultList.css';
 
 export interface Props {
-  items: object[];
+  items: DataItem[];
 }
 
 class ResultList extends React.Component<Props, null> {
   render() {
 
-    const renderItem = (item: object) => {
+    const renderItem = (item: DataItem) => {
      /* if (item['type'] === 'song') {
         return (
           <Song item={item} />

@@ -1,13 +1,25 @@
-import { EnthusiasmAction } from '../actions';
+import { QueryAction } from '../actions';
 import { StoreState } from '../types/index';
-import { INCREMENT_ENTHUSIASM, DECREMENT_ENTHUSIASM } from '../constants/index';
+import { ADD_QUERY_ITEM, REMOVE_QUERY_ITEM, RECIEVE_ITEMS } from '../constants/index';
 
-export function enthusiasm(state: StoreState, action: EnthusiasmAction): StoreState {
+export function items(state: StoreState, action: QueryAction): StoreState {
   switch (action.type) {
-    case INCREMENT_ENTHUSIASM:
-      return { ...state, enthusiasmLevel: state.enthusiasmLevel + 1 };
-    case DECREMENT_ENTHUSIASM:
-      return { ...state, enthusiasmLevel: Math.max(1, state.enthusiasmLevel - 1) };
+    case ADD_QUERY_ITEM:
+      return { 
+        ...state, 
+        queryItems: state.queryItems.concat(action.item) 
+      };
+    case REMOVE_QUERY_ITEM:
+      return { 
+        ...state, 
+        queryItems: state.queryItems.filter((item) => (item.id === action.item.id))
+      };
+    case RECIEVE_ITEMS:
+      return { 
+        ...state, 
+        resultItems: action.response as any
+      };
+    default:
+      return state;
   }
-  return state;
 }
