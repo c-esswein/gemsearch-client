@@ -16,10 +16,11 @@ class SearchFilter extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = {itemAddId: ''};
+    this.state = {itemAddId: '5730db37a90a9a398d00d213'};
 
     this.handleAddIdChange = this.handleAddIdChange.bind(this);
     this.handleItemAdd = this.handleItemAdd.bind(this);
+    this.handleRemoveItem = this.handleRemoveItem.bind(this);
   }
 
   handleAddIdChange(event: any) {
@@ -35,7 +36,7 @@ class SearchFilter extends React.Component<Props, State> {
   }
 
   queryItemInfo(id: string) {
-    return fetch('/api/object/' + id)
+    return fetch('/api/object/' + id.trim())
       .then(response => response.json())
       .then(function(result) {
         if (result.length > 0) {
@@ -46,6 +47,10 @@ class SearchFilter extends React.Component<Props, State> {
       });
   }
 
+  handleRemoveItem(item: DataItem, e: any) {
+    this.props.onQueryRemove(item);
+  }
+
   render() {
 
     const renderQueryItem = (item: DataItem) => {
@@ -54,6 +59,7 @@ class SearchFilter extends React.Component<Props, State> {
           {item.id} |
           {item.name} |
           {item.type}
+          <span className="SearchFilter__q-remove" onClick={this.handleRemoveItem.bind(this, item)}>remove</span>
         </div>
       );
     };

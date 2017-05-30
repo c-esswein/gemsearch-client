@@ -15,6 +15,11 @@ export interface Props {
 
 class App extends React.Component<Props, null> {
 
+  constructor(props: Props) {
+    super(props);
+    this.reQuery = this.reQuery.bind(this);
+  }
+
   componentWillReceiveProps(nextProps: Props) {
     if (nextProps.queryItems !== this.props.queryItems) {
       // this.props.queryForItems(nextProps.queryItems);
@@ -33,7 +38,11 @@ class App extends React.Component<Props, null> {
 
     fetch('/api/query?' + queryParams({'ids': queryIds.join('|')}))
       .then(response => response.json())
-      .then(json => this.props.recieveItems);
+      .then(json => this.props.recieveItems(json));
+  }
+
+  reQuery() {
+    this.queryForItems(this.props.queryItems);
   }
 
   render() {
@@ -43,7 +52,8 @@ class App extends React.Component<Props, null> {
       <div className="App">
         <SearchFilter 
           queryItems={props.queryItems} onQueryAdd={props.onAddQueryItem} onQueryRemove={props.onRemoveQueryItem} />
-        <ResultList items={props.resultItems} />
+        <ResultList items={props.resultItems} onQueryAdd={props.onAddQueryItem} />
+        <span onClick={this.reQuery}>reQuery items</span>
       </div>
     );
   }

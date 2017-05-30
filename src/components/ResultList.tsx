@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Item from './Item';
-import {DataItem} from '../types';
+import { DataItem } from '../types';
 /* import Artist from './Artist';
 import Song from './Song'; */
 
@@ -8,6 +8,7 @@ import './ResultList.css';
 
 export interface Props {
   items: DataItem[];
+  onQueryAdd: (item: DataItem) => void;
 }
 
 class ResultList extends React.Component<Props, null> {
@@ -25,7 +26,7 @@ class ResultList extends React.Component<Props, null> {
       } */
       
       return (
-        <Item item={item} />
+        <Item key={item.id} item={item} onQueryAdd={this.props.onQueryAdd} />
       );
     };
 

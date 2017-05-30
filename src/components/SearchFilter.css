@@ -9,3 +9,12 @@
     margin-bottom: 0.2em;
     font-size: 20px;
 }
+
+.SearchFilter__q-item {
+}
+
+.SearchFilter__q-remove {
+    color: blue;
+    cursor: pointer;
+    float: right;
+}

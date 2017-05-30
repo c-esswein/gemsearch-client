@@ -38,8 +38,8 @@ module.exports = {
     // Note: instead of the default WebpackDevServer client, we use a custom one
     // to bring better experience for Create React App users. You can replace
     // the line below with these two lines if you prefer the stock client:
-    // require.resolve('webpack-dev-server/client') + '?/',
-    // require.resolve('webpack/hot/dev-server'),
+    //require.resolve('webpack-dev-server/client') + '?',
+    //require.resolve('webpack/hot/only-dev-server'),
     require.resolve('react-dev-utils/webpackHotDevClient'),
     // We ship a few polyfills by default:
     require.resolve('./polyfills'),
@@ -108,8 +108,8 @@ module.exports = {
           // get properly excluded by /\.(js|jsx)$/ because of the query string.
           // Webpack 2 fixes this, but for now we include this hack.
           // https://github.com/facebookincubator/create-react-app/issues/1713
-          /\.(js|jsx)(\?.*)?$/,
-          /\.(ts|tsx)(\?.*)?$/,
+          /\.(js|jsx)?$/,
+          /\.(ts|tsx)?$/,
           /\.css$/,
           /\.json$/,
           /\.svg$/

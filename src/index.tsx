@@ -8,29 +8,35 @@ import { items } from './reducers/index';
 import { StoreState } from './types/index';
 import { Provider } from 'react-redux';
 import thunkMiddleware from 'redux-thunk';
-//import createLogger from 'redux-logger';
-
 const logger = require('redux-logger');
 
-const store = createStore<StoreState>(items, {
+declare var module: { hot: any };
+
+function configureStore(initialState: StoreState): any { // Store<StoreState>
+  const store = createStore<StoreState>(items, initialState,
+    applyMiddleware(thunkMiddleware, logger.createLogger()));
+
+  if (module.hot) {
+    module.hot.accept();
+    // Enable Webpack hot module replacement for reducers
+    module.hot.accept('./reducers', () => {
+      const nextRootReducer = require('./reducers').default;
+      store.replaceReducer(nextRootReducer);
+    });
+  }
+
+  return store;
+}
+
+const store = configureStore({
     queryItems: [],
     resultItems: []
-  },
-  applyMiddleware(thunkMiddleware, logger.createLogger())
+  }
 );
-/*
-if (module.hot) {
-  // Enable Webpack hot module replacement for reducers
-  module.hot.accept('./reducers', () => {
-    const nextRootReducer = require('./reducers').default;
-    store.replaceReducer(nextRootReducer);
-  });
-}
-*/
+
 ReactDOM.render(
   <Provider store={store}>
     <App />
   </Provider>,
   document.getElementById('root') as HTMLElement
 );
-

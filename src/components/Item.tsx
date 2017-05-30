@@ -1,9 +1,10 @@
 import * as React from 'react';
-import {DataItem} from '../types';
+import { DataItem } from '../types';
 import './Item.css';
 
 export interface Props {
   item: DataItem;
+  onQueryAdd: (item: DataItem) => void;
 }
 
 class Item extends React.Component<Props, null> {
@@ -15,7 +16,7 @@ class Item extends React.Component<Props, null> {
   }
 
   handleFilterClick_() {
-    alert('TODO');
+    this.props.onQueryAdd(this.props.item);
   }
 
   render() {
@@ -26,11 +27,11 @@ class Item extends React.Component<Props, null> {
             return (
                 <a className="Item-name" href={item.uri} title="View on Spotify">{item.name}</a>
             );
+        } else {
+          return (
+              <span>{item.name}</span>
+          );
         }
-
-        return (
-            <span>{item.name}</span>
-        );
     };
 
     return (
