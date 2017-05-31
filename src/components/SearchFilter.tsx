@@ -1,5 +1,7 @@
 import * as React from 'react';
 import {DataItem} from '../types';
+import Item from './Item';
+
 import './SearchFilter.css';
 
 export interface Props {
@@ -47,7 +49,7 @@ class SearchFilter extends React.Component<Props, State> {
       });
   }
 
-  handleRemoveItem(item: DataItem, e: any) {
+  handleRemoveItem(item: DataItem) {
     this.props.onQueryRemove(item);
   }
 
@@ -55,12 +57,7 @@ class SearchFilter extends React.Component<Props, State> {
 
     const renderQueryItem = (item: DataItem) => {
       return (
-        <div className="SearchFilter__q-item" key={item.id}>
-          {item.id} |
-          {item.name} |
-          {item.type}
-          <span className="SearchFilter__q-remove" onClick={this.handleRemoveItem.bind(this, item)}>remove</span>
-        </div>
+        <Item key={item.id} item={item} actionText="remove from query" onActionClick={this.handleRemoveItem} />
       );
     };
 
@@ -71,7 +68,6 @@ class SearchFilter extends React.Component<Props, State> {
         <form onSubmit={this.handleItemAdd}> 
           <input type="text" value={this.state.itemAddId} onChange={this.handleAddIdChange} placeholder="Object ID" /> 
         </form>
-        Current Filter:
         <div className="SearchFilter__q-items">
           {this.props.queryItems.map(renderQueryItem)}
         </div>

@@ -10,7 +10,8 @@
     font-size: 20px;
 }
 
-.SearchFilter__q-item {
+.SearchFilter .Item {
+    background: rgba(0, 188, 212, 0.21);
 }
 
 .SearchFilter__q-remove {

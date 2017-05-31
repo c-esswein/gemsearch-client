@@ -4,7 +4,8 @@ import './Item.css';
 
 export interface Props {
   item: DataItem;
-  onQueryAdd: (item: DataItem) => void;
+  actionText: string;
+  onActionClick: (item: DataItem) => void;
 }
 
 class Item extends React.Component<Props, null> {
@@ -16,7 +17,7 @@ class Item extends React.Component<Props, null> {
   }
 
   handleFilterClick_() {
-    this.props.onQueryAdd(this.props.item);
+    this.props.onActionClick(this.props.item);
   }
 
   render() {
@@ -39,7 +40,9 @@ class Item extends React.Component<Props, null> {
         <div className="Item-type">{item.type}</div>
         <div className="Song-inner">
           {renderTitle()}
-          <span className="Item-query-link" onClick={this.handleFilterClick_}>Use for query</span>
+          <span className="Item-query-link" onClick={this.handleFilterClick_}>
+            {this.props.actionText}
+          </span>
         </div>
       </div>
     );
