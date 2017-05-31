@@ -8,12 +8,15 @@
     "@types/react": "^15.0.24",
     "@types/react-dom": "^15.5.0",
     "@types/react-redux": "^4.4.40",
+    "@types/three": "^0.84.8",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "react-redux": "^5.0.5",
     "redux": "^3.6.0",
     "redux-logger": "^3.0.6",
-    "redux-thunk": "^2.2.0"
+    "redux-thunk": "^2.2.0",
+    "three": "^0.85.2",
+    "three-trackballcontrols": "0.0.5"
   },
   "devDependencies": {
     "app-root-path": "^2.0.1",

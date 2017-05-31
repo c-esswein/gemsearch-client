@@ -10,11 +10,10 @@ import { Provider } from 'react-redux';
 import thunkMiddleware from 'redux-thunk';
 const logger = require('redux-logger');
 
-declare var module: { hot: any };
+declare var module: { hot: { accept: (path?: string, callback?: () => void) => void } };
 
 function configureStore(initialState: StoreState): any { // Store<StoreState>
-  const store = createStore<StoreState>(items, initialState,
-    applyMiddleware(thunkMiddleware, logger.createLogger()));
+  const store = createStore<StoreState>(items, initialState, applyMiddleware(thunkMiddleware, logger.createLogger()));
 
   if (module.hot) {
     module.hot.accept();

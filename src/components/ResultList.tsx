@@ -19,7 +19,7 @@ class ResultList extends React.Component<Props, null> {
     };
 
     return (
-      <div className="ResultList">
+      <div className="ResultList App-wrap">
         {this.props.items.map(renderItem)}
       </div>
     );

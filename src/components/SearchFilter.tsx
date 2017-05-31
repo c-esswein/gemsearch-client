@@ -25,11 +25,11 @@ class SearchFilter extends React.Component<Props, State> {
     this.handleRemoveItem = this.handleRemoveItem.bind(this);
   }
 
-  handleAddIdChange(event: any) {
-    this.setState({itemAddId: event.target.value});
+  handleAddIdChange(event: React.FormEvent<HTMLInputElement>) {
+    this.setState({itemAddId: event.currentTarget.value});
   }
 
-  handleItemAdd(e: any) {
+  handleItemAdd(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     this.queryItemInfo(this.state.itemAddId).
@@ -40,7 +40,7 @@ class SearchFilter extends React.Component<Props, State> {
   queryItemInfo(id: string) {
     return fetch('/api/object/' + id.trim())
       .then(response => response.json())
-      .then(function(result) {
+      .then(function(result: DataItem[]) {
         if (result.length > 0) {
           return result[0];
         }
@@ -62,7 +62,7 @@ class SearchFilter extends React.Component<Props, State> {
     };
 
     return (
-      <div className="SearchFilter">
+      <div className="SearchFilter App-wrap">
         <h2 className="SearchFilter__hd">Search For:</h2>
         Add Item by Id: 
         <form onSubmit={this.handleItemAdd}> 

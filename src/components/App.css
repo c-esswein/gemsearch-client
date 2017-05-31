@@ -1,5 +1,29 @@
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
 .App {
+  /*margin: 10px auto;*/
+}
+
+.App-wrap {
   max-width: 1200px;
-  margin: 10px auto;
   padding: 20px;
+  margin: auto;
+}
+
+.App__view-links {
+  text-align: right;
+  padding: 10px 0;
+}
+
+.App__view-link {
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.App__view-link--active, .App__view-link:hover {
+  text-decoration: underline;
 }

@@ -16,7 +16,7 @@ class Item extends React.Component<Props, null> {
       this.handleFilterClick_ = this.handleFilterClick_.bind(this);
   }
 
-  handleFilterClick_() {
+  handleFilterClick_(e: React.MouseEvent<HTMLElement>) {
     this.props.onActionClick(this.props.item);
   }
 

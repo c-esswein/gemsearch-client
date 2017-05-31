@@ -1,5 +1,6 @@
 import * as React from 'react';
 import ResultList from './ResultList';
+import Graph from './Graph';
 import SearchFilter from './SearchFilter';
 import {DataItem} from '../types';
 import './App.css';
@@ -13,10 +14,21 @@ export interface Props {
   recieveItems: (query: DataItem[]) => void;
 }
 
-class App extends React.Component<Props, null> {
+interface State {
+  viewState: ViewState;
+}
+
+enum ViewState {
+    LIST, GRAPH
+}
+
+class App extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
+
+    this.state = {viewState: ViewState.GRAPH};
+
     this.reQuery = this.reQuery.bind(this);
   }
 
@@ -45,19 +57,51 @@ class App extends React.Component<Props, null> {
     this.queryForItems(this.props.queryItems);
   }
 
+  handleViewChangeClick(viewState: ViewState) {
+    this.setState({viewState});
+  }
+
   render() {
     const props = this.props;
+
+    const renderViewLink = (title: string, state: ViewState) => {
+      return (
+        <span 
+          className={'App__view-link ' + (this.state.viewState === state ? 'App__view-link--active' : '')}
+          onClick={this.handleViewChangeClick.bind(this, state)}>
+          {title}
+        </span>
+      );
+    };
+
+    const renderMainView = () => {
+      if (this.state.viewState === ViewState.LIST) {
+        return (
+          <ResultList items={props.resultItems} onQueryAdd={props.onAddQueryItem} />
+        );
+      } else {
+        return (
+          <Graph items={props.resultItems} onQueryAdd={props.onAddQueryItem} />
+        );        
+      }
+    };
 
     return (
       <div className="App">
         <SearchFilter 
           queryItems={props.queryItems} onQueryAdd={props.onAddQueryItem} onQueryRemove={props.onRemoveQueryItem} />
-        <ResultList items={props.resultItems} onQueryAdd={props.onAddQueryItem} />
+        
+        <div className="App__view-links">
+          {renderViewLink('Liste', ViewState.LIST)}
+          {renderViewLink('Graph', ViewState.GRAPH)}
+        </div>
+
+        {renderMainView()}
+
         <span onClick={this.reQuery}>reQuery items</span>
       </div>
     );
   }
 }
-
 
 export default App;

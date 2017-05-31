@@ -1,0 +1,8 @@
+
+.Graph {
+    background: #000;
+}
+
+.Graph__canvas {
+    overflow: hidden;
+}
