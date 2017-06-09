@@ -9,3 +9,6 @@ export type QUERY_FOR_ITEMS = typeof QUERY_FOR_ITEMS;
 
 export const RECEIVE_ITEMS = 'RECEIVE_ITEMS';
 export type RECEIVE_ITEMS = typeof RECEIVE_ITEMS;
+
+export const TYPE_FILTER_CHANGE = 'TYPE_FILTER_CHANGE';
+export type TYPE_FILTER_CHANGE = typeof TYPE_FILTER_CHANGE;

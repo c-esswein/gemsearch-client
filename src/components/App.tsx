@@ -5,7 +5,10 @@ import SearchFilter from './searchFilter';
 import { DataItem } from '../types';
 import { processServerResp } from '../api';
 
+var Select = require('react-select');
+
 import './app.css';
+import 'react-select/dist/react-select.css';
 
 export interface Props {
   resultItems: DataItem[];
@@ -14,6 +17,9 @@ export interface Props {
   onRemoveQueryItem: (item: DataItem) => void;
   queryForItems: (query: DataItem[]) => void;
   receiveItems: (query: DataItem[]) => void;
+
+  typeFilter: string[];
+  onTypeFilterChange: (filter: string[]) => void;
 }
 
 interface State {
@@ -30,16 +36,18 @@ class App extends React.Component<Props, State> {
     super(props);
 
     this.state = {viewState: ViewState.LIST};
+
+    this.onTypeFilterChange = this.onTypeFilterChange.bind(this);
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    if (nextProps.queryItems !== this.props.queryItems) {
-      // this.props.queryForItems(nextProps.queryItems);
-      this.queryForItems(nextProps.queryItems);
+    if (nextProps.queryItems !== this.props.queryItems ||
+      nextProps.typeFilter !== this.props.typeFilter) {
+      this.queryForItems(nextProps.queryItems, nextProps.typeFilter);
     }
   }
 
-  queryForItems(query: DataItem[]) {
+  queryForItems(query: DataItem[], typeFilter: string[]) {
     const queryIds = query.map(item => item.id);
 
     function queryParams(params: Object) {
@@ -48,7 +56,10 @@ class App extends React.Component<Props, State> {
           .join('&');
     }
 
-    fetch('/api/query?' + queryParams({'ids': queryIds.join('|')}))
+    fetch('/api/query?' + queryParams({
+      'ids': queryIds.join('|'),
+      'types': typeFilter.join('|')
+    }))
       .then(response => response.json())
       .then(json => processServerResp(json))
       .then(data => this.props.receiveItems(data));
@@ -56,6 +67,10 @@ class App extends React.Component<Props, State> {
 
   handleViewChangeClick(viewState: ViewState) {
     this.setState({viewState});
+  }
+
+  onTypeFilterChange(filter: {value: string}[]) {
+    this.props.onTypeFilterChange(filter.map(item => item.value));
   }
 
   render() {
@@ -83,14 +98,24 @@ class App extends React.Component<Props, State> {
       }
     };
 
+    const typeOptions = ['track', 'tag', 'artist', 'user'].map(item => ({value: item, label: item}));
+
     return (
       <div className="App">
         <SearchFilter 
           queryItems={props.queryItems} onQueryAdd={props.onAddQueryItem} onQueryRemove={props.onRemoveQueryItem} />
         
-        <div className="App__view-links">
-          {renderViewLink('Liste', ViewState.LIST)}
-          {renderViewLink('Graph', ViewState.GRAPH)}
+        <div className="App-wrap">
+          <Select
+            value={props.typeFilter}
+            options={typeOptions}
+            onChange={this.onTypeFilterChange}
+            multi={true}
+          />
+          <div className="App__view-links">
+            {renderViewLink('Liste', ViewState.LIST)}
+            {renderViewLink('Graph', ViewState.GRAPH)}
+          </div>
         </div>
 
         {renderMainView()}

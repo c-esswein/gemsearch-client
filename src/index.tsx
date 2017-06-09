@@ -30,7 +30,8 @@ function configureStore(initialState: StoreState): any { // Store<StoreState>
 
 const store = configureStore({
     queryItems: [],
-    resultItems: []
+    resultItems: [],
+    typeFilter: ['track', 'artist']
   }
 );
 

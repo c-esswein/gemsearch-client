@@ -1,7 +1,7 @@
 import * as constants from '../constants';
 import { DataItem } from '../types';
 
-export type Action = AddQueryItem | RemoveQueryItem | QueryForItems | ReceiveItems;
+export type Action = AddQueryItem | RemoveQueryItem | QueryForItems | ReceiveItems | ChangeTypeFilter;
 
 export interface AddQueryItem {
     type: constants.ADD_QUERY_ITEM;
@@ -44,5 +44,16 @@ export function receiveItems(response: Object): ReceiveItems {
     return {
         type: constants.RECEIVE_ITEMS,
         response
+    };
+}
+
+export interface ChangeTypeFilter {
+    type: constants.TYPE_FILTER_CHANGE;
+    filter: string[];
+}
+export function changeTypeFilter(filter: string[]): ChangeTypeFilter {
+    return {
+        type: constants.TYPE_FILTER_CHANGE,
+        filter
     };
 }

@@ -3,10 +3,11 @@ import * as actions from '../actions';
 import { StoreState, DataItem } from '../types';
 import { connect, Dispatch } from 'react-redux';
 
-export function mapStateToProps({ queryItems, resultItems }: StoreState) {
+export function mapStateToProps({ queryItems, resultItems, typeFilter }: StoreState) {
   return {
     queryItems,
-    resultItems
+    resultItems,
+    typeFilter 
   };
 }
 
@@ -16,6 +17,7 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.Action>) {
     onRemoveQueryItem: (item: DataItem) => dispatch(actions.removeQueryItem(item)),
     queryForItems: (query: DataItem[]) => dispatch(actions.queryForItems(query)),
     receiveItems: (response: Object) => dispatch(actions.receiveItems(response)),
+    onTypeFilterChange: (filter: string[]) => dispatch(actions.changeTypeFilter(filter))
   };
 }
 

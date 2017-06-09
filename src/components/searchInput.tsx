@@ -91,7 +91,6 @@ export class SearchInput extends React.Component<Props, State> {
 
     const getSuggestionValue = (suggestion) => suggestion.name;
 
-    // Finally, render it!
     return (
       <Autosuggest
         suggestions={suggestions}
