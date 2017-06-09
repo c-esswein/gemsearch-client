@@ -1,9 +1,11 @@
 import * as React from 'react';
-import ResultList from './ResultList';
-import Graph from './Graph';
-import SearchFilter from './SearchFilter';
-import {DataItem} from '../types';
-import './App.css';
+import ResultList from './resultList';
+import Graph from './graph';
+import SearchFilter from './searchFilter';
+import { DataItem } from '../types';
+import { processServerResp } from '../api';
+
+import './app.css';
 
 export interface Props {
   resultItems: DataItem[];
@@ -11,7 +13,7 @@ export interface Props {
   onAddQueryItem: (item: DataItem) => void;
   onRemoveQueryItem: (item: DataItem) => void;
   queryForItems: (query: DataItem[]) => void;
-  recieveItems: (query: DataItem[]) => void;
+  receiveItems: (query: DataItem[]) => void;
 }
 
 interface State {
@@ -27,9 +29,7 @@ class App extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    this.state = {viewState: ViewState.GRAPH};
-
-    this.reQuery = this.reQuery.bind(this);
+    this.state = {viewState: ViewState.LIST};
   }
 
   componentWillReceiveProps(nextProps: Props) {
@@ -50,11 +50,8 @@ class App extends React.Component<Props, State> {
 
     fetch('/api/query?' + queryParams({'ids': queryIds.join('|')}))
       .then(response => response.json())
-      .then(json => this.props.recieveItems(json));
-  }
-
-  reQuery() {
-    this.queryForItems(this.props.queryItems);
+      .then(json => processServerResp(json))
+      .then(data => this.props.receiveItems(data));
   }
 
   handleViewChangeClick(viewState: ViewState) {
@@ -97,8 +94,6 @@ class App extends React.Component<Props, State> {
         </div>
 
         {renderMainView()}
-
-        <span onClick={this.reQuery}>reQuery items</span>
       </div>
     );
   }

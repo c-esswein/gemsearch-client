@@ -1,8 +1,10 @@
 import * as React from 'react';
-import {DataItem} from '../types';
-import Item from './Item';
+import { DataItem } from '../types';
+import Item from './item';
+import { processServerResp } from '../api';
+import { SearchInput } from './searchInput';
 
-import './SearchFilter.css';
+import './searchFilter.css';
 
 export interface Props {
   queryItems: DataItem[];
@@ -18,7 +20,7 @@ class SearchFilter extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = {itemAddId: '5730db37a90a9a398d00d213'};
+    this.state = {itemAddId: ''};
 
     this.handleAddIdChange = this.handleAddIdChange.bind(this);
     this.handleItemAdd = this.handleItemAdd.bind(this);
@@ -40,6 +42,7 @@ class SearchFilter extends React.Component<Props, State> {
   queryItemInfo(id: string) {
     return fetch('/api/object/' + id.trim())
       .then(response => response.json())
+      .then(json => processServerResp(json))
       .then(function(result: DataItem[]) {
         if (result.length > 0) {
           return result[0];
@@ -68,6 +71,8 @@ class SearchFilter extends React.Component<Props, State> {
         <form onSubmit={this.handleItemAdd}> 
           <input type="text" value={this.state.itemAddId} onChange={this.handleAddIdChange} placeholder="Object ID" /> 
         </form>
+        Search:
+        <SearchInput onQueryAdd={this.props.onQueryAdd} />
         <div className="SearchFilter__q-items">
           {this.props.queryItems.map(renderQueryItem)}
         </div>

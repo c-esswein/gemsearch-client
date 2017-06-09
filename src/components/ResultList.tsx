@@ -1,8 +1,8 @@
 import * as React from 'react';
-import Item from './Item';
+import Item from './item';
 import { DataItem } from '../types';
 
-import './ResultList.css';
+import './resultList.css';
 
 export interface Props {
   items: DataItem[];

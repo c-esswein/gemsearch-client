@@ -3,13 +3,16 @@ import { DataItem } from '../types';
 import * as THREE from 'three';
 import {TrackballControls} from '../misc/TrackballControls';
 
-import './Graph.css';
+import './graph.css';
 
 export interface Props {
   items: DataItem[];
   onQueryAdd: (item: DataItem) => void;
 }
 
+/**
+ * Three.js Graph visualization.
+ */
 class Graph extends React.Component<Props, null> {
 
   renderContainer: HTMLElement;
@@ -66,7 +69,7 @@ class Graph extends React.Component<Props, null> {
     this.animate();
   }
 
-  drawGraph(data: {nodes: number[], graph: number[][]}) {
+  drawGraph(data: {nodes: number[], graph: number[]}) {
     
     var particles;
     var PARTICLE_SIZE = 2;
@@ -104,8 +107,8 @@ class Graph extends React.Component<Props, null> {
    * @param lines Array of Pairs which represents connected nodes.
    * @param nodes Node positions.
    */
-  drawLines(lines: number[][], nodes: Float32Array) {
-
+  drawLines(lines: number[], nodes: Float32Array) {
+/*
     var positions = new Float32Array(lines.length * 3 * 2);
 
     var copyPoint = (target: Float32Array, i: number, source: Float32Array, j: number) => {
@@ -117,11 +120,11 @@ class Graph extends React.Component<Props, null> {
     lines.forEach((line: number[], i: number) => {
       copyPoint(positions, i * 2 + 0, nodes, line[0]);
       copyPoint(positions, i * 2 + 1, nodes, line[1]);
-    });
-
+    });*/
 
     var geometry = new THREE.BufferGeometry();
-    geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.addAttribute('position', new THREE.BufferAttribute(nodes, 3));
+    geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(lines), 1));
 
     var material = new THREE.LineBasicMaterial({ color: 0x0000ff });
     var line = new THREE.Line(geometry, material);
