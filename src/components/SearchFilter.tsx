@@ -1,15 +1,15 @@
 import * as React from 'react';
 import { DataItem } from '../types';
 import Item from './item';
+import * as actions from '../actions';
 import { processServerResp } from '../api';
 import { SearchInput } from './searchInput';
 
 import './searchFilter.css';
+import { DispatchContext } from '../containers/dispatchContextProvider';
 
 export interface Props {
   queryItems: DataItem[];
-  onQueryAdd: (item: DataItem) => void;
-  onQueryRemove: (item: DataItem) => void;
 }
 
 interface State {
@@ -17,6 +17,10 @@ interface State {
 }
 
 class SearchFilter extends React.Component<Props, State> {
+  static contextTypes = {
+    dispatch: React.PropTypes.func.isRequired,
+  };
+  context: DispatchContext;
 
   constructor(props: Props) {
     super(props);
@@ -35,7 +39,7 @@ class SearchFilter extends React.Component<Props, State> {
     e.preventDefault();
 
     this.queryItemInfo(this.state.itemAddId).
-      then(item => item && this.props.onQueryAdd(item));
+      then(item => item && this.context.dispatch(actions.addQueryItem(item)));
     this.setState({itemAddId: ''});
   }
 
@@ -53,7 +57,7 @@ class SearchFilter extends React.Component<Props, State> {
   }
 
   handleRemoveItem(item: DataItem) {
-    this.props.onQueryRemove(item);
+    this.context.dispatch(actions.removeQueryItem(item));
   }
 
   render() {
@@ -72,7 +76,7 @@ class SearchFilter extends React.Component<Props, State> {
           <input type="text" value={this.state.itemAddId} onChange={this.handleAddIdChange} placeholder="Object ID" /> 
         </form>
         Search:
-        <SearchInput onQueryAdd={this.props.onQueryAdd} />
+        <SearchInput />
         <div className="SearchFilter__q-items">
           {this.props.queryItems.map(renderQueryItem)}
         </div>

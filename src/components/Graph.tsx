@@ -7,7 +7,6 @@ import './graph.css';
 
 export interface Props {
   items: DataItem[];
-  onQueryAdd: (item: DataItem) => void;
 }
 
 /**

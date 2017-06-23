@@ -9,6 +9,7 @@ import { items } from './reducers/index';
 import { StoreState } from './types/index';
 import { Provider } from 'react-redux';
 import thunkMiddleware from 'redux-thunk';
+import { DispatchContextProvider } from './containers/dispatchContextProvider';
 const logger = require('redux-logger');
 
 declare var module: { hot: { accept: (path?: string, callback?: () => void) => void } };
@@ -37,7 +38,9 @@ const store = configureStore({
 
 ReactDOM.render(
   <Provider store={store}>
-    <App />
+    <DispatchContextProvider dispatch={store.dispatch}>
+      <App />
+    </DispatchContextProvider>
   </Provider>,
   document.getElementById('root') as HTMLElement
 );

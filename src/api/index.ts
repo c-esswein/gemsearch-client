@@ -5,6 +5,6 @@ export function processServerResp(response: any) {
         return response['data'];
     } else {
         alert('Error');
-        console.error(response);
+        throw Error(response['errors']);
     }
 };

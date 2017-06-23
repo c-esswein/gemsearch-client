@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { DispatchContext } from './dispatchContextProvider';
+import { DispatchContext } from '../containers/dispatchContextProvider';
 import { processServerResp } from '../api';
 import { DataItem } from '../types';
+import * as actions from '../actions';
 
 // TODO: import did not work
 var Autosuggest = require('react-autosuggest');
@@ -9,7 +10,6 @@ var Autosuggest = require('react-autosuggest');
 import './searchInput.css';
 
 export interface Props {
-  onQueryAdd: (item: DataItem) => void;
 }
 
 export interface State {
@@ -18,11 +18,10 @@ export interface State {
 }
 
 export class SearchInput extends React.Component<Props, State> {
-/*  static contextTypes = {
+  static contextTypes = {
     dispatch: React.PropTypes.func.isRequired,
   };
-
-  context: DispatchContext;*/
+  context: DispatchContext;
 
   constructor() {
     super();
@@ -65,7 +64,7 @@ export class SearchInput extends React.Component<Props, State> {
   }
 
   onSuggestionSelected(e: React.UIEvent<Element>, { suggestion }) {
-    this.props.onQueryAdd(suggestion);
+    this.context.dispatch(actions.addQueryItem(suggestion));
     
     this.setState({
       value: ''

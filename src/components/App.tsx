@@ -4,22 +4,19 @@ import Graph from './graph';
 import SearchFilter from './searchFilter';
 import { DataItem } from '../types';
 import { processServerResp } from '../api';
+import * as actions from '../actions';
 
 var Select = require('react-select');
 
 import './app.css';
 import 'react-select/dist/react-select.css';
+import { DispatchContext } from '../containers/dispatchContextProvider';
 
 export interface Props {
   resultItems: DataItem[];
   queryItems: DataItem[];
-  onAddQueryItem: (item: DataItem) => void;
-  onRemoveQueryItem: (item: DataItem) => void;
-  queryForItems: (query: DataItem[]) => void;
-  receiveItems: (query: DataItem[]) => void;
 
   typeFilter: string[];
-  onTypeFilterChange: (filter: string[]) => void;
 }
 
 interface State {
@@ -31,6 +28,11 @@ enum ViewState {
 }
 
 class App extends React.Component<Props, State> {
+  static contextTypes = {
+    dispatch: React.PropTypes.func.isRequired,
+  };
+
+  context: DispatchContext;
 
   constructor(props: Props) {
     super(props);
@@ -62,7 +64,7 @@ class App extends React.Component<Props, State> {
     }))
       .then(response => response.json())
       .then(json => processServerResp(json))
-      .then(data => this.props.receiveItems(data));
+      .then(data => this.context.dispatch(actions.receiveItems(data)));
   }
 
   handleViewChangeClick(viewState: ViewState) {
@@ -70,7 +72,8 @@ class App extends React.Component<Props, State> {
   }
 
   onTypeFilterChange(filter: {value: string}[]) {
-    this.props.onTypeFilterChange(filter.map(item => item.value));
+    const filterAction = actions.changeTypeFilter(filter.map(item => item.value));
+    this.context.dispatch(filterAction);
   }
 
   render() {
@@ -89,11 +92,11 @@ class App extends React.Component<Props, State> {
     const renderMainView = () => {
       if (this.state.viewState === ViewState.LIST) {
         return (
-          <ResultList items={props.resultItems} onQueryAdd={props.onAddQueryItem} />
+          <ResultList items={props.resultItems} />
         );
       } else {
         return (
-          <Graph items={props.resultItems} onQueryAdd={props.onAddQueryItem} />
+          <Graph items={props.resultItems} />
         );        
       }
     };
@@ -102,8 +105,7 @@ class App extends React.Component<Props, State> {
 
     return (
       <div className="App">
-        <SearchFilter 
-          queryItems={props.queryItems} onQueryAdd={props.onAddQueryItem} onQueryRemove={props.onRemoveQueryItem} />
+        <SearchFilter queryItems={props.queryItems} />
         
         <div className="App-wrap">
           <Select
