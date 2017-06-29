@@ -5,9 +5,19 @@ export interface StoreState {
     typeFilter: string[];
 }
 
+export interface ImageData {
+    width: number,
+    height: number,
+    url: string
+}
+
 export interface DataItem {
     type: string;
     id: string;
     name: string;
-    uri: string;
+    meta?: {
+        uri?: string,
+        preview_url?: string,
+        images?: ImageData[]
+    }
 }

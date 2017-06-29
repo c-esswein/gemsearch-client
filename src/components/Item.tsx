@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { DataItem } from 'types';
 
-require('./item.css');
+require('./item.scss');
 
 export interface Props {
   item: DataItem;
@@ -24,10 +24,23 @@ export class Item extends React.Component<Props, null> {
   render() {
     const item = this.props.item;
 
+    const renderImage = () => {
+      if (item.meta && item.meta.images && item.meta.images.length > 0) {
+        const imageVersion = item.meta.images.find(image => image.width === 300) || item.meta.images[0];
+        return (
+          <div className="item__image" style={{backgroundImage: `url(${imageVersion.url})`}}></div>
+        );
+      }
+
+      return (
+        <div className="item__image item__image--empty"></div>
+      );
+    };
+
     const renderTitle = () => {
-        if (item.uri) {
+        if (item.meta && item.meta.uri) {
             return (
-                <a className="Item-name" href={item.uri} title="View on Spotify">{item.name}</a>
+                <a className="item__name" href={item.meta.uri} title="View on Spotify">{item.name}</a>
             );
         } else {
           return (
@@ -37,11 +50,12 @@ export class Item extends React.Component<Props, null> {
     };
 
     return (
-      <div className="Item" key={item.id}>
-        <div className="Item-type">{item.type}</div>
-        <div className="Song-inner">
+      <div className="item" key={item.id}>
+        <div className="item__type">{item.type}</div>
+        {renderImage()}
+        <div className="item__inner">
           {renderTitle()}
-          <span className="Item-query-link" onClick={this.handleFilterClick_}>
+          <span className="item__query-link" onClick={this.handleFilterClick_}>
             {this.props.actionText}
           </span>
         </div>

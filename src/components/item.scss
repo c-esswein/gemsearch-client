@@ -1,0 +1,43 @@
+
+@import "constants.scss";
+
+.item {
+    padding: 10px;
+    background: $colorCard;
+    margin-top: 10px;
+}
+
+.item__type {
+    font-size: 80%;
+}
+
+.item__image {
+    width: 100%;
+    max-width: 200px; // TODO: remove for new layout
+    position: relative;
+    background-color: gray;
+    background-size: cover;
+
+    &:before {
+        display: block;
+        content: '';
+        padding-bottom: 100%;
+    }
+}
+
+.item__name {
+    text-decoration: none;
+    color: #fff;
+    font-weight: bold;
+    margin: .3em 0;
+    display: inline-block;
+}
+
+.item__query-link {
+    font-size: 70%;
+    float: right;
+    cursor: pointer;
+}
+.item__query-link:hover {
+    color: #3F51B5;
+}

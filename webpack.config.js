@@ -272,7 +272,12 @@ module.exports = function(env) {
       watchOptions: {
         poll: false, // enable polling here
       },
-      // proxy?
+      proxy: {
+        '/api': {
+          target: 'http://localhost:5000',
+          secure: false
+        }
+      },
       disableHostCheck: true, // FIXME: should be replaced with allowedHosts once https://github.com/webpack/webpack-dev-server/pull/899 is merged
     };
   }

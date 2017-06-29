@@ -43,7 +43,7 @@
     ],
     "brace-style": [
       true,
-      "stroustrup",
+      "1tbs",
       {
         "allowSingleLine": true
       }

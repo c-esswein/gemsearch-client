@@ -10,7 +10,9 @@ import thunkMiddleware from 'redux-thunk';
 import { DispatchContextProvider } from 'components/dispatchContextProvider';
 import { AppContainer as ReactHotLoaderAppContainer } from 'react-hot-loader';
 
-require('./index.css');
+require('styles/index.scss');
+require('styles/react-autosuggest.scss'); // TODO scss import is not working
+require('react-select/dist/react-select.css');
 
 function configureStore(initialState: StoreState) {
   const store = createStore(items as any, initialState, applyMiddleware(thunkMiddleware));

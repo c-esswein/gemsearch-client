@@ -7,8 +7,8 @@ import { processServerResp } from 'api';
 import * as actions from 'actions';
 import * as Select from 'react-select';
 
-require('./app.css');
-require('react-select/dist/react-select.css');
+require('./app.scss');
+
 import { DispatchContext } from 'components/dispatchContextProvider';
 
 export interface Props {

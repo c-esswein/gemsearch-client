@@ -6,12 +6,12 @@
 .react-autosuggest__input {
   width: 240px;
   height: 30px;
-  padding: 10px 20px;
+  padding: .2em;
   font-family: Helvetica, sans-serif;
   font-weight: 300;
   font-size: 16px;
   border: 1px solid #aaa;
-  border-radius: 4px;
+  // border-radius: 4px;
 }
 
 .react-autosuggest__input--focused {
@@ -46,6 +46,7 @@
   margin: 0;
   padding: 0;
   list-style-type: none;
+  color: #000;
 }
 
 .react-autosuggest__suggestion {

@@ -46,7 +46,7 @@ export class SearchFilter extends React.Component<Props, State> {
   queryItemInfo(id: string) {
     return fetch('/api/object/' + id.trim())
       .then(response => response.json())
-      .then(json => processServerResp(json))
+      .then(processServerResp)
       .then(function(result: DataItem[]) {
         if (result.length > 0) {
           return result[0];
@@ -74,6 +74,7 @@ export class SearchFilter extends React.Component<Props, State> {
         <form onSubmit={this.handleItemAdd}> 
           <input type="text" value={this.state.itemAddId} onChange={this.handleAddIdChange} placeholder="Object ID" /> 
         </form>
+        
         Search:
         <SearchInput />
         <div className="SearchFilter__q-items">
