@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { DataItem } from '../types';
-import Item from './item';
-import * as actions from '../actions';
-import { processServerResp } from '../api';
-import { SearchInput } from './searchInput';
+import { DataItem } from 'types';
+import * as actions from 'actions';
+import { processServerResp } from 'api';
+import { Item } from 'components/item';
+import { SearchInput } from 'components/searchInput';
+import { DispatchContext } from 'components/dispatchContextProvider';
 
-import './searchFilter.css';
-import { DispatchContext } from '../containers/dispatchContextProvider';
+require('./searchFilter.css');
 
 export interface Props {
   queryItems: DataItem[];
@@ -16,7 +16,7 @@ interface State {
   itemAddId: string;
 }
 
-class SearchFilter extends React.Component<Props, State> {
+export class SearchFilter extends React.Component<Props, State> {
   static contextTypes = {
     dispatch: React.PropTypes.func.isRequired,
   };
@@ -61,7 +61,6 @@ class SearchFilter extends React.Component<Props, State> {
   }
 
   render() {
-
     const renderQueryItem = (item: DataItem) => {
       return (
         <Item key={item.id} item={item} actionText="remove from query" onActionClick={this.handleRemoveItem} />
@@ -85,4 +84,3 @@ class SearchFilter extends React.Component<Props, State> {
   }
 }
 
-export default SearchFilter;

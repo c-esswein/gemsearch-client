@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { DataItem } from '../types';
 import * as THREE from 'three';
-import {TrackballControls} from '../misc/TrackballControls';
+import { DataItem } from 'types';
+import {TrackballControls} from 'misc/TrackballControls';
 
-import './graph.css';
+require('./graph.css');
 
 export interface Props {
   items: DataItem[];
@@ -12,7 +12,7 @@ export interface Props {
 /**
  * Three.js Graph visualization.
  */
-class Graph extends React.Component<Props, null> {
+export class Graph extends React.Component<Props, null> {
 
   renderContainer: HTMLElement;
   renderer: THREE.WebGLRenderer;
@@ -98,7 +98,7 @@ class Graph extends React.Component<Props, null> {
     particles = new THREE.Points(geometry);
     this.scene.add(particles);
 
-    this.drawLines(data.graph, positions);
+    //this.drawLines(data.graph, positions);
   }
 
   /**
@@ -190,5 +190,3 @@ class Graph extends React.Component<Props, null> {
    );
   }
 }
-
-export default Graph;

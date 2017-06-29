@@ -1,16 +1,15 @@
 import * as React from 'react';
-import ResultList from './resultList';
-import Graph from './graph';
-import SearchFilter from './searchFilter';
-import { DataItem } from '../types';
-import { processServerResp } from '../api';
-import * as actions from '../actions';
+import { ResultList } from 'components/resultList';
+import { Graph } from 'components/graph';
+import { SearchFilter } from 'components/searchFilter';
+import { DataItem } from 'types';
+import { processServerResp } from 'api';
+import * as actions from 'actions';
+import * as Select from 'react-select';
 
-var Select = require('react-select');
-
-import './app.css';
-import 'react-select/dist/react-select.css';
-import { DispatchContext } from '../containers/dispatchContextProvider';
+require('./app.css');
+require('react-select/dist/react-select.css');
+import { DispatchContext } from 'components/dispatchContextProvider';
 
 export interface Props {
   resultItems: DataItem[];
@@ -27,7 +26,7 @@ enum ViewState {
     LIST, GRAPH
 }
 
-class App extends React.Component<Props, State> {
+export class App extends React.Component<Props, State> {
   static contextTypes = {
     dispatch: React.PropTypes.func.isRequired,
   };
@@ -63,7 +62,7 @@ class App extends React.Component<Props, State> {
       'types': typeFilter.join('|')
     }))
       .then(response => response.json())
-      .then(json => processServerResp(json))
+      .then(processServerResp)
       .then(data => this.context.dispatch(actions.receiveItems(data)));
   }
 
@@ -126,4 +125,18 @@ class App extends React.Component<Props, State> {
   }
 }
 
-export default App;
+
+import { connect } from 'react-redux';
+import { StoreState } from 'types';
+
+export const ConnectedApp = connect(
+  ({ queryItems, resultItems, typeFilter }: StoreState) => {
+    return {
+      queryItems,
+      resultItems,
+      typeFilter 
+    };
+  },
+)(App as any);
+// TODO: fix typings
+

@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "EditorConfig.EditorConfig",
+        "Orta.vscode-jest",
+        "msjsdiag.debugger-for-chrome",
+        "rebornix.project-snippets",
+        "wayou.vscode-todo-highlight",
+        "streetsidesoftware.code-spell-checker",
+        "eg2.tslint",
+    ]
+}

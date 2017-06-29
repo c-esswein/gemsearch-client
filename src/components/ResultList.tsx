@@ -1,16 +1,16 @@
 import * as React from 'react';
-import Item from './item';
-import { DataItem } from '../types';
-import * as actions from '../actions';
+import { Item } from 'components/item';
+import { DataItem } from 'types';
+import * as actions from 'actions';
+import { DispatchContext } from 'components/dispatchContextProvider';
 
-import './resultList.css';
-import { DispatchContext } from '../containers/dispatchContextProvider';
+require('./resultList.css');
 
 export interface Props {
   items: DataItem[];
 }
 
-class ResultList extends React.Component<Props, null> {
+export class ResultList extends React.Component<Props, null> {
 
   static contextTypes = {
     dispatch: React.PropTypes.func.isRequired,
@@ -42,5 +42,3 @@ class ResultList extends React.Component<Props, null> {
     this.context.dispatch(actions.addQueryItem(item));
   }
 }
-
-export default ResultList;

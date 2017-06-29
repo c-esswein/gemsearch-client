@@ -1,0 +1,76 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  // this is a task to list all typescript errors in vscode
+  "version": "0.1.0",
+  "command": "./node_modules/.bin/webpack-dev-server",
+  "windows": {
+    "command": "node_modules\\.bin\\webpack-dev-server"
+  },
+  "args": [
+    "--port=8088",
+    "--hot",
+    "--inline"
+  ],
+  "isShellCommand": true,
+  "suppressTaskName": true,
+  "showOutput": "always",
+  "isBackground": true,
+  "echoCommand": true,
+  "tasks": [
+    {
+      "suppressTaskName": true,
+      "taskName": "serve-client",
+      "isBuildCommand": true,
+      "isBackground": true,
+      "problemMatcher": [
+        {
+          "owner": "custom",
+          "fileLocation": "relative",
+          "applyTo": "closedDocuments",
+          "severity": "error",
+          "pattern": [
+            {
+              "regexp": "^(ERROR|WARNING) in (.+\\.(tsx?|jsx?))",
+              "severity": 1,
+              "file": 2
+            },
+            {
+              "regexp": "^\\(([0-9]+),([0-9]+)\\): *(.*)",
+              "line": 1,
+              "column": 2,
+              "message": 3
+            }
+          ],
+          "watching": {
+            "activeOnStart": true,
+            "beginsPattern": "^webpack: Compiling\\.\\.\\.$",
+            "endsPattern": "^webpack: (Compiled successfully|Failed to compile|Compiled with warnings)\\.$"
+          }
+        },
+        {
+          "owner": "javascript",
+          "severity": "error",
+          "applyTo": "allDocuments",
+          "fileLocation": [
+            "relative",
+            "${workspaceRoot}"
+          ],
+          "pattern": [
+            {
+              "regexp": "^(WARNING|ERROR).*postcss.*!(.+)$",
+              "severity": 1,
+              "file": 2
+            },
+            {
+              "regexp": "^.*: .*?:([0-9]+):([0-9]+): *(.*)",
+              "line": 1,
+              "column": 2,
+              "message": 3
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

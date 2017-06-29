@@ -1,0 +1,56 @@
+{
+  "redux connect": {
+    "prefix": "connect",
+    "body": [
+      "import * as store from 'store';",
+      "import {connect} from 'react-redux';",
+      "import * as React from 'react';",
+      "import * as Immutable from 'immutable';",
+      "",
+      "${3:export }interface ${2:Props} {",
+      "}",
+      "",
+      "$3const Connected${1} = connect(",
+      "  (state: store.State, ownProps: $2) => {",
+      "    return {",
+      "      //propname: state.somewhere.in.the.store,",
+      "    };",
+      "  }, ",
+      "  (dispatch, ownProps: $2) => ({",
+      "    //callback: (callbackArg: string) => dispatch(actionCreator()),",
+      "  }),",
+      ")(${1:YourComponent});"
+    ],
+    "description": "connect a component to the redux store"
+  },
+  "redux thunk (thunk only)": {
+    "prefix": "redux thunk",
+    "body": [
+      "return async (dispatch: redux.Dispatch<store.State>, getState: () => store.State) => {",
+      "  $0",
+      "}"
+    ],
+    "description": "the thunk for redux-thunk"
+  },
+  "redux action": {
+    "prefix": "redux action",
+    "body": [
+      "export interface Action${1:NAME_OF_ACTION} extends redux.Action {",
+      "  type: '$1',",
+      "  $0",
+      "}"
+    ],
+    "description": "a redux action definition (dont forget to add the action to `store/index.ts`)"
+  },
+  "redux action creator": {
+    "prefix": "redux_action-creator_(with_thunk)",
+    "body": [
+      "export function ${1:doSomething}(branch: string){",
+      "  return async (dispatch: redux.Dispatch<store.State>, getState: () => store.State) => {",
+      "    //dispatch(yourAction);",
+      "  }",
+      "}"
+    ],
+    "description": "the thunk for redux-thunk"
+  }
+}

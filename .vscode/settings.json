@@ -1,3 +1,37 @@
-// Place your settings in this file to overwrite default and user settings.
 {
+  "typescript.tsdk": "./node_modules/typescript/lib",
+  "search.exclude": {
+    "**/node_modules/": true,
+    "**/bower_components/": true,
+    "dist/": true,
+    "tmp/": true,
+    "test-results/": true,
+    "build/": true
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "dist/": true,
+    "tmp/": true,
+    "coverage/": true
+  },
+  "files.encoding": "utf8",
+  "files.eol": "\n",
+  "todohighlight.include": "{**/*.js,**/*.jsx,**/*.ts**/*.tsx,**/*.html,**/*.php,**/*.css,**/*.scss,**/*.md,**/*.java,**/*.json}",
+  "todohighlight.exclude": "{**/node_modules/**,**/bower_components/**,**/dist/**,**/build/**,**/.vscode/**,**/_output/**,**/*.min.*,**/*.map,**/test-results/**}",
+  "workbench.colorCustomizations": {
+    //"statusBar.background": "#1ab394",
+    //"activityBarBadge.background": "#1ab394",
+    //"list.activeSelectionBackground": "#1ab394",
+    // greendark
+    "focusBorder": "#169c81"
+      //"editorSuggestWidget.selectedBackground": "#169c81" 
+  },
+  "vsicons.presets.angular": false,
+  "typescriptHero.resolver.pathStringDelimiter": "'",
+  "tslint.alwaysShowRuleFailuresAsWarnings": true,
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "tslint.autoFixOnSave": true
 }

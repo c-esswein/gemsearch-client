@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { DataItem } from '../types';
+import { DataItem } from 'types';
 
-import './item.css';
+require('./item.css');
 
 export interface Props {
   item: DataItem;
@@ -9,7 +9,7 @@ export interface Props {
   onActionClick: (item: DataItem) => void;
 }
 
-class Item extends React.Component<Props, null> {
+export class Item extends React.Component<Props, null> {
 
   constructor(props: Props) {
       super(props);
@@ -49,5 +49,3 @@ class Item extends React.Component<Props, null> {
     );
   }
 }
-
-export default Item;

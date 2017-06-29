@@ -1,13 +1,12 @@
 import * as React from 'react';
-import { DispatchContext } from '../containers/dispatchContextProvider';
-import { processServerResp } from '../api';
-import { DataItem } from '../types';
-import * as actions from '../actions';
+import { DispatchContext } from 'components/dispatchContextProvider';
+import { processServerResp } from 'api';
+import { DataItem } from 'types';
+import * as actions from 'actions';
+import * as Autosuggest from 'react-autosuggest';
 
-// TODO: import did not work
-var Autosuggest = require('react-autosuggest');
 
-import './searchInput.css';
+require('./searchInput.css');
 
 export interface Props {
 }
@@ -48,7 +47,7 @@ export class SearchInput extends React.Component<Props, State> {
   onSuggestionsFetchRequested({ value }) {
     return fetch('/api/suggest/' + value.trim())
       .then(response => response.json())
-      .then(json => processServerResp(json))
+      .then(processServerResp)
       .then(result => {
         this.setState({
           suggestions: result
