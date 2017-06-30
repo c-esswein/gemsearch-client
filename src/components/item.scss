@@ -37,7 +37,8 @@
     font-size: 70%;
     float: right;
     cursor: pointer;
-}
-.item__query-link:hover {
-    color: #3F51B5;
+ 
+    &:hover {
+        color: #000;
+    }
 }

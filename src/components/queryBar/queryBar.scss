@@ -1,0 +1,27 @@
+
+@import "constants.scss";
+
+.queryBar {
+    padding: 10px 0;
+}
+
+.queryBar__control {
+    display: flex;
+    border: 2px solid $colorCard;
+    padding: 10px;
+}
+
+.queryBar__q-items {
+    display: flex;
+
+    .item {
+        background: rgba(0, 188, 212, 0.21);
+        margin-right: 10px;
+    }
+}
+
+.queryBar__q-remove {
+    color: blue;
+    cursor: pointer;
+    float: right;
+}

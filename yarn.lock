@@ -119,9 +119,19 @@
   version "3.6.31"
   resolved "https://registry.yarnpkg.com/@types/redux/-/redux-3.6.31.tgz#40eafa7575db36b912ce0059b85de98c205b0708"
 
+"@types/three@^0.84.15":
+  version "0.84.15"
+  resolved "https://registry.yarnpkg.com/@types/three/-/three-0.84.15.tgz#4aa1965de2153fc7827e0c2cfb996e15c92a0a40"
+  dependencies:
+    "@types/webvr-api" "*"
+
 "@types/webpack-env@^1.13.0":
   version "1.13.0"
   resolved "https://registry.yarnpkg.com/@types/webpack-env/-/webpack-env-1.13.0.tgz#3044381647e11ee973c5af2e925323930f691d80"
+
+"@types/webvr-api@*":
+  version "0.0.31"
+  resolved "https://registry.yarnpkg.com/@types/webvr-api/-/webvr-api-0.0.31.tgz#f6061fe88a035d34a8b6a0c55f8758901ec8a08e"
 
 JSONStream@^0.8.4:
   version "0.8.4"

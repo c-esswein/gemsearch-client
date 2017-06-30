@@ -4,7 +4,7 @@ import { ConnectedApp } from 'components/app';
 
 import { createStore, applyMiddleware } from 'redux';
 import { items } from 'reducers/index';
-import { StoreState } from 'types/index';
+import { StoreState, ViewState } from 'types/index';
 import { Provider } from 'react-redux';
 import thunkMiddleware from 'redux-thunk';
 import { DispatchContextProvider } from 'components/dispatchContextProvider';
@@ -12,7 +12,7 @@ import { AppContainer as ReactHotLoaderAppContainer } from 'react-hot-loader';
 
 require('styles/index.scss');
 require('styles/react-autosuggest.scss'); // TODO scss import is not working
-require('react-select/dist/react-select.css');
+require('styles/react-select.scss');
 
 function configureStore(initialState: StoreState) {
   const store = createStore(items as any, initialState, applyMiddleware(thunkMiddleware));
@@ -23,7 +23,12 @@ function configureStore(initialState: StoreState) {
 const store = configureStore({
     queryItems: [],
     resultItems: [],
-    typeFilter: ['track', 'artist']
+    typeFilter: ['track', 'artist'],
+    views: {
+      app: {
+        viewState: ViewState.LIST
+      }
+    }
   }
 );
 

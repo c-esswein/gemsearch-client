@@ -3,10 +3,10 @@ import { DataItem } from 'types';
 import * as actions from 'actions';
 import { processServerResp } from 'api';
 import { Item } from 'components/item';
-import { SearchInput } from 'components/searchInput';
+import { SearchInput } from 'components/queryBar/searchInput';
 import { DispatchContext } from 'components/dispatchContextProvider';
 
-require('./searchFilter.css');
+require('./queryBar.scss');
 
 export interface Props {
   queryItems: DataItem[];
@@ -16,7 +16,7 @@ interface State {
   itemAddId: string;
 }
 
-export class SearchFilter extends React.Component<Props, State> {
+export class QueryBar extends React.Component<Props, State> {
   static contextTypes = {
     dispatch: React.PropTypes.func.isRequired,
   };
@@ -68,17 +68,16 @@ export class SearchFilter extends React.Component<Props, State> {
     };
 
     return (
-      <div className="SearchFilter App-wrap">
-        <h2 className="SearchFilter__hd">Search For:</h2>
-        Add Item by Id: 
-        <form onSubmit={this.handleItemAdd}> 
+      <div className="queryBar app-wrap">
+        {/*<form onSubmit={this.handleItemAdd}> 
           <input type="text" value={this.state.itemAddId} onChange={this.handleAddIdChange} placeholder="Object ID" /> 
         </form>
-        
-        Search:
-        <SearchInput />
-        <div className="SearchFilter__q-items">
-          {this.props.queryItems.map(renderQueryItem)}
+        */}
+        <div className="queryBar__control">
+          <div className="queryBar__q-items">
+            {this.props.queryItems.map(renderQueryItem)}
+          </div>
+          <SearchInput />
         </div>
       </div>
     );

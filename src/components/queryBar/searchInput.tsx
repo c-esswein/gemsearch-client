@@ -5,7 +5,6 @@ import { DataItem } from 'types';
 import * as actions from 'actions';
 import * as Autosuggest from 'react-autosuggest';
 
-
 require('./searchInput.css');
 
 export interface Props {
@@ -75,7 +74,7 @@ export class SearchInput extends React.Component<Props, State> {
 
     // Autosuggest will pass through all these props to the input element.
     const inputProps = {
-      placeholder: 'Type to search',
+      placeholder: 'Search...',
       value,
       onChange: this.onChange
     };

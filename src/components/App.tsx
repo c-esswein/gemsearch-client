@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ResultList } from 'components/resultList';
-import { Graph } from 'components/graph';
-import { SearchFilter } from 'components/searchFilter';
+import { Graph } from 'components/graph/graph';
+import { QueryBar } from 'components/queryBar/queryBar';
 import { DataItem } from 'types';
 import { processServerResp } from 'api';
 import * as actions from 'actions';
@@ -16,17 +16,10 @@ export interface Props {
   queryItems: DataItem[];
 
   typeFilter: string[];
+  viewState: ViewState
 }
 
-interface State {
-  viewState: ViewState;
-}
-
-enum ViewState {
-    LIST, GRAPH
-}
-
-export class App extends React.Component<Props, State> {
+export class App extends React.Component<Props, null> {
   static contextTypes = {
     dispatch: React.PropTypes.func.isRequired,
   };
@@ -35,8 +28,6 @@ export class App extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-
-    this.state = {viewState: ViewState.LIST};
 
     this.onTypeFilterChange = this.onTypeFilterChange.bind(this);
   }
@@ -67,7 +58,8 @@ export class App extends React.Component<Props, State> {
   }
 
   handleViewChangeClick(viewState: ViewState) {
-    this.setState({viewState});
+    const viewChangeAction = actions.changeMainViewType(viewState);
+    this.context.dispatch(viewChangeAction);
   }
 
   onTypeFilterChange(filter: {value: string}[]) {
@@ -81,7 +73,7 @@ export class App extends React.Component<Props, State> {
     const renderViewLink = (title: string, state: ViewState) => {
       return (
         <span 
-          className={'App__view-link ' + (this.state.viewState === state ? 'App__view-link--active' : '')}
+          className={'app__view-link ' + (this.props.viewState === state ? 'app__view-link--active' : '')}
           onClick={this.handleViewChangeClick.bind(this, state)}>
           {title}
         </span>
@@ -89,7 +81,7 @@ export class App extends React.Component<Props, State> {
     };
 
     const renderMainView = () => {
-      if (this.state.viewState === ViewState.LIST) {
+      if (this.props.viewState === ViewState.LIST) {
         return (
           <ResultList items={props.resultItems} />
         );
@@ -103,17 +95,17 @@ export class App extends React.Component<Props, State> {
     const typeOptions = ['track', 'tag', 'artist', 'user'].map(item => ({value: item, label: item}));
 
     return (
-      <div className="App">
-        <SearchFilter queryItems={props.queryItems} />
+      <div className="app">
+        <QueryBar queryItems={props.queryItems} />
         
-        <div className="App-wrap">
+        <div className="app-wrap app__filter">
           <Select
             value={props.typeFilter}
             options={typeOptions}
             onChange={this.onTypeFilterChange}
-            multi={true}
+            multi={true} clearable={false}
           />
-          <div className="App__view-links">
+          <div className="app__view-links">
             {renderViewLink('Liste', ViewState.LIST)}
             {renderViewLink('Graph', ViewState.GRAPH)}
           </div>
@@ -127,14 +119,15 @@ export class App extends React.Component<Props, State> {
 
 
 import { connect } from 'react-redux';
-import { StoreState } from 'types';
+import { StoreState, ViewState } from 'types';
 
 export const ConnectedApp = connect(
-  ({ queryItems, resultItems, typeFilter }: StoreState) => {
+  ({ queryItems, resultItems, typeFilter, views }: StoreState) => {
     return {
       queryItems,
       resultItems,
-      typeFilter 
+      typeFilter,
+      viewState: views.app.viewState
     };
   },
 )(App as any);

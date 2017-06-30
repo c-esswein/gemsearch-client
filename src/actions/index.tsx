@@ -1,7 +1,7 @@
 import * as constants from '../constants';
-import { DataItem } from '../types';
+import { DataItem, ViewState } from '../types';
 
-export type Action = AddQueryItem | RemoveQueryItem | QueryForItems | ReceiveItems | ChangeTypeFilter;
+export type Action = AddQueryItem | RemoveQueryItem | QueryForItems | ReceiveItems | ChangeTypeFilter | ChangeMainViewType;
 
 export interface AddQueryItem {
     type: constants.ADD_QUERY_ITEM;
@@ -55,5 +55,16 @@ export function changeTypeFilter(filter: string[]): ChangeTypeFilter {
     return {
         type: constants.TYPE_FILTER_CHANGE,
         filter
+    };
+}
+
+export interface ChangeMainViewType {
+    type: constants.MAIN_VIEW_TYPE_CHANGE;
+    viewState: ViewState;
+}
+export function changeMainViewType(viewState: ViewState): ChangeMainViewType {
+    return {
+        type: constants.MAIN_VIEW_TYPE_CHANGE,
+        viewState
     };
 }

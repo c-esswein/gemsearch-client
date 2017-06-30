@@ -1,0 +1,17 @@
+
+.graph {
+    // background: #000;
+}
+
+// type color map
+.graph__type-colors {
+    display: flex;
+}
+.graph__type-color {
+    padding: 5px;
+    text-transform: uppercase;
+}
+
+.graph__canvas {
+    overflow: hidden;
+}

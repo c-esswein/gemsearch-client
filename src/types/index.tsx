@@ -1,8 +1,17 @@
 
+export enum ViewState {
+    LIST, GRAPH
+}
+
 export interface StoreState {
     queryItems: DataItem[];
     resultItems: DataItem[];
     typeFilter: string[];
+    views: {
+        app: {
+            viewState: ViewState;
+        }
+    }
 }
 
 export interface ImageData {
@@ -12,7 +21,7 @@ export interface ImageData {
 }
 
 export interface DataItem {
-    type: string;
+    type: ItemType;
     id: string;
     name: string;
     meta?: {
@@ -21,3 +30,5 @@ export interface DataItem {
         images?: ImageData[]
     }
 }
+
+export type ItemType = 'tag' | 'artist' | 'track';

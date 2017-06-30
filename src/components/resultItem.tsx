@@ -1,17 +1,13 @@
 import * as React from 'react';
 import { DataItem } from 'types';
+import { Item } from 'components/item';
 
 require('./item.scss');
 
-export interface Props {
-  item: DataItem;
-  actionText: string;
-  onActionClick: (item: DataItem) => void;
-}
 
-export class Item extends React.Component<Props, null> {
+export class ResultItem extends Item {
 
-  constructor(props: Props) {
+  constructor(props) {
       super(props);
 
       this.handleFilterClick_ = this.handleFilterClick_.bind(this);

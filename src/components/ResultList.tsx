@@ -32,7 +32,7 @@ export class ResultList extends React.Component<Props, null> {
     };
 
     return (
-      <div className="ResultList App-wrap">
+      <div className="resultList app-wrap">
         {this.props.items.map(renderItem)}
       </div>
     );

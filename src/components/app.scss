@@ -1,12 +1,12 @@
 
 @import "constants.scss";
 
-.App {
+.app {
   margin: 50px 0;
   padding: 0 20px;
 }
 
-.App-wrap {
+.app-wrap {
   max-width: 1600px;
   padding: 20px;
   margin: auto;
@@ -14,16 +14,26 @@
   color: $colorMainFont;
 }
 
-.App__view-links {
-  text-align: right;
+.app__filter {
+  display: flex;
+}
+
+.app__view-links {
   padding: 10px 0;
+  margin-left: auto;
 }
 
-.App__view-link {
+.app__view-link {
   cursor: pointer;
-  margin-left: 10px;
-}
+  padding: .4em .8em;
+  border-radius: 1px;
+  text-transform: uppercase;
+  color: $colorCard;
+  margin: .2em;
+  font-weight: 600;
 
-.App__view-link--active, .App__view-link:hover {
-  text-decoration: underline;
+  &--active, &:hover {
+    color: #fff;
+    background: $colorCard;
+  }
 }

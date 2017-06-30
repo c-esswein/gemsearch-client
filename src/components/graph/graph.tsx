@@ -1,9 +1,12 @@
+/* tslint:disable:no-magic-numbers */
 import * as React from 'react';
 import * as THREE from 'three';
-import { DataItem } from 'types';
+import { DataItem, ItemType } from 'types';
 import {TrackballControls} from 'misc/TrackballControls';
+import { xFetch } from 'utils';
+import { TypeColors } from 'constants/colors';
 
-require('./graph.css');
+require('./graph.scss');
 
 export interface Props {
   items: DataItem[];
@@ -25,7 +28,7 @@ export class Graph extends React.Component<Props, null> {
   componentDidMount() {
     this.renderThreeScene(this.renderContainer);
 
-    fetch('/api/graph')
+    xFetch('/api/graph')
       .then(response => response.json())
       .then(json => this.drawGraph(json));
   }
@@ -34,7 +37,7 @@ export class Graph extends React.Component<Props, null> {
     this.renderer.dispose();
   }
 
-  renderThreeScene(renderContainer: HTMLElement) {
+  private renderThreeScene(renderContainer: HTMLElement) {
     
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
@@ -54,7 +57,7 @@ export class Graph extends React.Component<Props, null> {
     cube.position.y = 150;
     this.scene.add(cube);*/
     
-    this.renderer = new THREE.WebGLRenderer();
+    this.renderer = new THREE.WebGLRenderer({ alpha: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.setRendererSize();
     renderContainer.appendChild(this.renderer.domElement);
@@ -68,37 +71,37 @@ export class Graph extends React.Component<Props, null> {
     this.animate();
   }
 
-  drawGraph(data: {nodes: number[], graph: number[]}) {
-    
-    var particles;
-    var PARTICLE_SIZE = 2;
+  private drawGraph(data: {nodes: number[], typeMapping: ItemType[], graph: number[]}) {
+    const PARTICLE_SIZE = 2;
 
-    var positions = Float32Array.from(data.nodes);
-    var numberOfNodes = data.nodes.length / 3;
-    var colors = new Float32Array(numberOfNodes * 3);
-    var sizes = new Float32Array(numberOfNodes);
-    var color = new THREE.Color();
+    const positions = Float32Array.from(data.nodes);
+    const numberOfNodes = data.nodes.length / 3;
+    const colors = new Float32Array(numberOfNodes * 3);
+    const sizes = new Float32Array(numberOfNodes);
+    const color = new THREE.Color();
     
-    var scaling = 100;
-    for (var i = 0, l = numberOfNodes; i < l; i++) {
+    const scaling = 200;
+    for (let i = 0, l = numberOfNodes; i < l; i++) {
       positions[i * 3 + 0] *= scaling;
       positions[i * 3 + 1] *= scaling;
       positions[i * 3 + 2] *= scaling;
 
-      color.setHSL(0.01 + 0.1 * (i / l), 1.0, 0.5);
+      color.setHex(TypeColors[data.typeMapping[i]] || TypeColors.default);
       color.toArray(colors as any, i * 3);
 
       sizes[i] = PARTICLE_SIZE * 0.5;
     }
-    var geometry = new THREE.BufferGeometry();
+    
+    const geometry = new THREE.BufferGeometry();
     geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.addAttribute('customColor', new THREE.BufferAttribute(colors, 3));
+    geometry.addAttribute('color', new THREE.BufferAttribute(colors, 3));
     geometry.addAttribute('size', new THREE.BufferAttribute(sizes, 1));
 
-    particles = new THREE.Points(geometry);
+    const pointMaterial = new THREE.PointsMaterial({vertexColors : THREE.VertexColors });
+    const particles = new THREE.Points(geometry, pointMaterial);
     this.scene.add(particles);
 
-    //this.drawLines(data.graph, positions);
+    // this.drawLines(data.graph, positions);
   }
 
   /**
@@ -106,8 +109,8 @@ export class Graph extends React.Component<Props, null> {
    * @param lines Array of Pairs which represents connected nodes.
    * @param nodes Node positions.
    */
-  drawLines(lines: number[], nodes: Float32Array) {
-/*
+  private drawLines(lines: number[], nodes: Float32Array) {
+  /*
     var positions = new Float32Array(lines.length * 3 * 2);
 
     var copyPoint = (target: Float32Array, i: number, source: Float32Array, j: number) => {
@@ -121,28 +124,28 @@ export class Graph extends React.Component<Props, null> {
       copyPoint(positions, i * 2 + 1, nodes, line[1]);
     });*/
 
-    var geometry = new THREE.BufferGeometry();
+    const geometry = new THREE.BufferGeometry();
     geometry.addAttribute('position', new THREE.BufferAttribute(nodes, 3));
     geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(lines), 1));
 
-    var material = new THREE.LineBasicMaterial({ color: 0x0000ff });
-    var line = new THREE.Line(geometry, material);
+    const material = new THREE.LineBasicMaterial({ color: 0x0000ff });
+    const line = new THREE.Line(geometry, material);
     this.scene.add(line);
   }
   
-  onDocumentMouseMove(event: React.MouseEvent<HTMLElement>) {
+  private onDocumentMouseMove(event: React.MouseEvent<HTMLElement>) {
     event.preventDefault();
     this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     this.mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
   }
 
-  onWindowResize() {
+  private onWindowResize() {
     this.controls.handleResize();
   }
 
-  setRendererSize() {
-    var width = this.renderContainer.offsetWidth;
-    var height = window.innerHeight - this.renderContainer.offsetTop;
+  private setRendererSize() {
+    const width = this.renderContainer.offsetWidth;
+    let height = window.innerHeight - this.renderContainer.offsetTop;
     height = Math.max(height, 300);
 
     this.camera.aspect = width / height;
@@ -150,14 +153,14 @@ export class Graph extends React.Component<Props, null> {
     this.renderer.setSize(width, height);
   }
 
-  animate() {
+  private animate() {
     requestAnimationFrame(this.animate.bind(this));
     this.controls.update();
     this.renderGL();
     // stats.update();
   }
 
-  renderGL() {
+  private renderGL() {
     /*
     particles.rotation.x += 0.0005;
     particles.rotation.y += 0.001;
@@ -181,11 +184,19 @@ export class Graph extends React.Component<Props, null> {
     this.renderer.render(this.scene, this.camera);
   }
 
-  render() {
+  public render() {
 
+    // TODO: render type colors in type filter and remove hints here
     return (
-      <div className="Graph">
-          <div className="Graph__canvas" ref={(el) => { this.renderContainer = el; }} />
+      <div className="graph">
+          <div className="graph__type-colors">
+            {Object.keys(TypeColors).map(type => (
+              <div className="graph__type-color" key={type} style={{color: '#' + TypeColors[type].toString(16)}}>
+                {type}
+              </div>
+            ))}
+          </div>
+          <div className="graph__canvas" ref={(el) => { this.renderContainer = el; }} />
       </div>
    );
   }
