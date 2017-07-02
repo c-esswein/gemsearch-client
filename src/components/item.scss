@@ -5,10 +5,12 @@
     padding: 10px;
     background: $colorCard;
     margin-top: 10px;
+    position: relative;
 }
 
 .item__type {
     font-size: 80%;
+    font-weight: 200;
 }
 
 .item__image {
@@ -35,10 +37,17 @@
 
 .item__query-link {
     font-size: 70%;
-    float: right;
+    position: absolute;
+    top: 15px;
+    right: 15px;
     cursor: pointer;
  
     &:hover {
         color: #000;
+    }
+
+    &-icon.svg-inline {
+        width: 1.5em;
+        height: 1.5em;
     }
 }

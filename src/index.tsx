@@ -11,6 +11,7 @@ import { DispatchContextProvider } from 'components/dispatchContextProvider';
 import { AppContainer as ReactHotLoaderAppContainer } from 'react-hot-loader';
 
 require('styles/index.scss');
+require('styles/svg.scss');
 require('styles/react-autosuggest.scss'); // TODO scss import is not working
 require('styles/react-select.scss');
 

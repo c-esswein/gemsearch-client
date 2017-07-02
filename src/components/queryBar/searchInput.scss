@@ -1,0 +1,46 @@
+
+.searchInput {
+    flex: 1;
+
+    .react-autosuggest__input {
+        color: #fff;
+        background: none;
+        font-family: inherit;
+        font-size: 3em;
+        border: none;
+        width: 100%;
+        box-sizing: border-box;
+        height: auto;
+        padding: 0 .2em;
+    }
+
+    .react-autosuggest__suggestions-container--open {
+        border: none;
+        font-family: inherit;
+        font-weight: 400;
+    }
+
+    .react-autosuggest__suggestion {
+        border-bottom: 1px solid;
+
+        &--last {
+            border-bottom: none;
+        }
+    }
+}
+
+
+
+.searchInput__suggest {
+
+}
+
+.searchInput__suggest-type {
+    font-size: .8em;
+    display: block;
+}
+
+.searchInput__suggest-name {
+
+}
+

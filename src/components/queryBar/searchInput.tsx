@@ -5,9 +5,10 @@ import { DataItem } from 'types';
 import * as actions from 'actions';
 import * as Autosuggest from 'react-autosuggest';
 
-require('./searchInput.css');
+require('./searchInput.scss');
 
 export interface Props {
+  onRemoveLatestSelection: () => void;
 }
 
 export interface State {
@@ -33,9 +34,10 @@ export class SearchInput extends React.Component<Props, State> {
     this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
     this.onSuggestionsClearRequested = this.onSuggestionsClearRequested.bind(this);
     this.onSuggestionSelected = this.onSuggestionSelected.bind(this);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
-  onChange(e, { newValue }) {
+  private onChange(e, { newValue }) {
     this.setState({
       value: newValue
     });
@@ -43,7 +45,7 @@ export class SearchInput extends React.Component<Props, State> {
 
   // Autosuggest will call this function every time you need to update suggestions.
   // You already implemented this logic above, so just use it.
-  onSuggestionsFetchRequested({ value }) {
+  private onSuggestionsFetchRequested({ value }) {
     return fetch('/api/suggest/' + value.trim())
       .then(response => response.json())
       .then(processServerResp)
@@ -55,18 +57,26 @@ export class SearchInput extends React.Component<Props, State> {
   }
 
   // Autosuggest will call this function every time you need to clear suggestions.
-  onSuggestionsClearRequested() {
+  private onSuggestionsClearRequested() {
     this.setState({
       suggestions: []
     });
   }
 
-  onSuggestionSelected(e: React.UIEvent<Element>, { suggestion }) {
+  private onSuggestionSelected(e: React.UIEvent<Element>, { suggestion }) {
     this.context.dispatch(actions.addQueryItem(suggestion));
     
     this.setState({
       value: ''
     });
+  }
+
+  private handleKeyDown(e: KeyboardEvent) {
+    if(e.key === 'Backspace' || e.key === 'Delete') {
+      if (this.state.value === '') {
+        this.props.onRemoveLatestSelection();
+      }
+    }
   }
 
   render() {
@@ -76,12 +86,13 @@ export class SearchInput extends React.Component<Props, State> {
     const inputProps = {
       placeholder: 'Search...',
       value,
-      onChange: this.onChange
+      onChange: this.onChange,
+      onKeyDown: this.handleKeyDown,
     };
 
     const renderSuggestion = (suggestion) => (
       <div className="searchInput__suggest">
-        <span className="searchInput__suggest-type">{suggestion.type}:</span>
+        <span className="searchInput__suggest-type">{suggestion.type}</span>
         <span className="searchInput__suggest-name">{suggestion.name}</span>
       </div>
     );
@@ -89,15 +100,17 @@ export class SearchInput extends React.Component<Props, State> {
     const getSuggestionValue = (suggestion) => suggestion.name;
 
     return (
-      <Autosuggest
-        suggestions={suggestions}
-        onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-        onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-        getSuggestionValue={getSuggestionValue}
-        onSuggestionSelected={this.onSuggestionSelected}
-        renderSuggestion={renderSuggestion}
-        inputProps={inputProps}
-      />
+      <div className="searchInput">
+        <Autosuggest
+          suggestions={suggestions}
+          onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+          onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+          getSuggestionValue={getSuggestionValue}
+          onSuggestionSelected={this.onSuggestionSelected}
+          renderSuggestion={renderSuggestion}
+          inputProps={inputProps}
+        />
+      </div>
     );
   }
 }

@@ -24,11 +24,12 @@ export class Graph extends React.Component<Props, null> {
   controls: THREE.TrackballControls;
   mouse: {x: number, y: number};
   INTERSECTED: boolean;
+  positions: Float32Array;
 
   componentDidMount() {
     this.renderThreeScene(this.renderContainer);
 
-    xFetch('/api/graph')
+    xFetch('/api/nodes')
       .then(response => response.json())
       .then(json => this.drawGraph(json));
   }
@@ -101,7 +102,11 @@ export class Graph extends React.Component<Props, null> {
     const particles = new THREE.Points(geometry, pointMaterial);
     this.scene.add(particles);
 
-    // this.drawLines(data.graph, positions);
+    this.positions = positions;
+    
+    xFetch('/api/graph')
+      .then(response => response.json())
+      .then(json => this.drawLines(json));
   }
 
   /**
@@ -109,7 +114,7 @@ export class Graph extends React.Component<Props, null> {
    * @param lines Array of Pairs which represents connected nodes.
    * @param nodes Node positions.
    */
-  private drawLines(lines: number[], nodes: Float32Array) {
+  private drawLines(data: {edges: number[]}) {
   /*
     var positions = new Float32Array(lines.length * 3 * 2);
 
@@ -125,8 +130,8 @@ export class Graph extends React.Component<Props, null> {
     });*/
 
     const geometry = new THREE.BufferGeometry();
-    geometry.addAttribute('position', new THREE.BufferAttribute(nodes, 3));
-    geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(lines), 1));
+    geometry.addAttribute('position', new THREE.BufferAttribute(this.positions, 3));
+    geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(data.edges), 1));
 
     const material = new THREE.LineBasicMaterial({ color: 0x0000ff });
     const line = new THREE.Line(geometry, material);

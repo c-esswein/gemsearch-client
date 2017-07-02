@@ -2,9 +2,10 @@ import * as React from 'react';
 import { DataItem } from 'types';
 import * as actions from 'actions';
 import { processServerResp } from 'api';
-import { Item } from 'components/item';
+import { QueryItem } from 'components/queryBar/queryItem';
 import { SearchInput } from 'components/queryBar/searchInput';
 import { DispatchContext } from 'components/dispatchContextProvider';
+import { SearchIcon } from 'icons';
 
 require('./queryBar.scss');
 
@@ -29,13 +30,14 @@ export class QueryBar extends React.Component<Props, State> {
     this.handleAddIdChange = this.handleAddIdChange.bind(this);
     this.handleItemAdd = this.handleItemAdd.bind(this);
     this.handleRemoveItem = this.handleRemoveItem.bind(this);
+    this.handleInputRemove = this.handleInputRemove.bind(this);
   }
 
-  handleAddIdChange(event: React.FormEvent<HTMLInputElement>) {
+  private handleAddIdChange(event: React.FormEvent<HTMLInputElement>) {
     this.setState({itemAddId: event.currentTarget.value});
   }
 
-  handleItemAdd(e: React.FormEvent<HTMLFormElement>) {
+  private handleItemAdd(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     this.queryItemInfo(this.state.itemAddId).
@@ -43,7 +45,7 @@ export class QueryBar extends React.Component<Props, State> {
     this.setState({itemAddId: ''});
   }
 
-  queryItemInfo(id: string) {
+  private queryItemInfo(id: string) {
     return fetch('/api/object/' + id.trim())
       .then(response => response.json())
       .then(processServerResp)
@@ -56,14 +58,21 @@ export class QueryBar extends React.Component<Props, State> {
       });
   }
 
-  handleRemoveItem(item: DataItem) {
+  private handleRemoveItem(item: DataItem) {
     this.context.dispatch(actions.removeQueryItem(item));
+  }
+
+  private handleInputRemove() {
+    if (this.props.queryItems.length > 0) {
+      const lastItem = this.props.queryItems[this.props.queryItems.length - 1];
+      this.context.dispatch(actions.removeQueryItem(lastItem));
+    }
   }
 
   render() {
     const renderQueryItem = (item: DataItem) => {
       return (
-        <Item key={item.id} item={item} actionText="remove from query" onActionClick={this.handleRemoveItem} />
+        <QueryItem key={item.id} item={item} actionText="remove from query" onActionClick={this.handleRemoveItem} />
       );
     };
 
@@ -77,7 +86,8 @@ export class QueryBar extends React.Component<Props, State> {
           <div className="queryBar__q-items">
             {this.props.queryItems.map(renderQueryItem)}
           </div>
-          <SearchInput />
+          <SearchInput onRemoveLatestSelection={this.handleInputRemove} />
+          <SearchIcon className="svg-inline svg-fill-current queryBar__icon" />
         </div>
       </div>
     );

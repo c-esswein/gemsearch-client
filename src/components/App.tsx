@@ -1,15 +1,18 @@
 import * as React from 'react';
+import * as Select from 'react-select';
+
+require('./app.scss');
+
+import { IntroPanel } from 'components/introPanel';
 import { ResultList } from 'components/resultList';
 import { Graph } from 'components/graph/graph';
 import { QueryBar } from 'components/queryBar/queryBar';
 import { DataItem } from 'types';
 import { processServerResp } from 'api';
 import * as actions from 'actions';
-import * as Select from 'react-select';
-
-require('./app.scss');
-
 import { DispatchContext } from 'components/dispatchContextProvider';
+import { GraphIcon, ListIcon } from 'icons';
+
 
 export interface Props {
   resultItems: DataItem[];
@@ -75,12 +78,22 @@ export class App extends React.Component<Props, null> {
         <span 
           className={'app__view-link ' + (this.props.viewState === state ? 'app__view-link--active' : '')}
           onClick={this.handleViewChangeClick.bind(this, state)}>
-          {title}
+          {state === ViewState.GRAPH ? 
+              <GraphIcon /> :
+              <ListIcon />
+          }
+          <span>{title}</span>
         </span>
       );
     };
 
     const renderMainView = () => {
+      if (this.props.queryItems.length < 1) {
+        return (
+          <IntroPanel />
+        );
+      }
+
       if (this.props.viewState === ViewState.LIST) {
         return (
           <ResultList items={props.resultItems} />

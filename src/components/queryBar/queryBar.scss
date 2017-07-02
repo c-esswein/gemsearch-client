@@ -7,6 +7,7 @@
 
 .queryBar__control {
     display: flex;
+    align-items: center;
     border: 2px solid $colorCard;
     padding: 10px;
 }
@@ -24,4 +25,21 @@
     color: blue;
     cursor: pointer;
     float: right;
+}
+
+.queryBar__item {
+    position: relative;
+    padding-right: 35px;
+    padding-left: 20px;
+    margin-top: 0;
+
+    .item__query-link {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+    }
+}
+.svg-inline.queryBar__icon {
+    height: 3em;
+    width: 3em;
 }

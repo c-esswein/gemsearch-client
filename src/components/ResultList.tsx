@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { Item } from 'components/item';
+import { ResultItem } from 'components/resultItem';
 import { DataItem } from 'types';
 import * as actions from 'actions';
 import { DispatchContext } from 'components/dispatchContextProvider';
 
-require('./resultList.css');
+require('./resultList.scss');
 
 export interface Props {
   items: DataItem[];
@@ -27,7 +27,7 @@ export class ResultList extends React.Component<Props, null> {
 
     const renderItem = (item: DataItem) => {
       return (
-        <Item key={item.id} item={item} actionText="Use for query" onActionClick={this.handleItemActionClick} />
+        <ResultItem key={item.id} item={item} actionText="Use for query" onActionClick={this.handleItemActionClick} />
       );
     };
 
