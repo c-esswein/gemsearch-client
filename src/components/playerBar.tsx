@@ -1,13 +1,17 @@
 import * as React from 'react';
 import * as actions from 'actions';
-import { DispatchContext } from 'components/dispatchContextProvider';
 
-import { getAuthStatus, authorize } from 'api/spotify';
-import * as SpotifyWebApi from 'spotify-web-api-js';
+import { Track } from 'types';
+import { PlayIcon, PauseIcon } from 'icons';
+import { DispatchContext } from 'components/dispatchContextProvider';
+import { AuthControl } from 'components/authControl';
+import * as playerActions from 'actions/player';
 
 require('./playerBar.scss');
 
 export interface Props {
+  currentTrack: Track,
+  isPlaying: boolean,
 }
 
 export class PlayerBar extends React.Component<Props, null> {
@@ -17,43 +21,105 @@ export class PlayerBar extends React.Component<Props, null> {
   };
   context: DispatchContext;
 
+  private audio: HTMLAudioElement;
+
   constructor(props: Props) {
     super(props);
 
-    this.handleLoginClick = this.handleLoginClick.bind(this);
-    this.getUserMusic = this.getUserMusic.bind(this);
+    this.audio = new Audio();
+
+    this.handleControlsClick = this.handleControlsClick.bind(this);
   }
 
-  private handleLoginClick() {
-    getAuthStatus().then(code => {
-      console.log(code);
-
-      if (!code) {
-
-        authorize();
-      }
-    });
+  componentWillReceiveProps(nextProps: Props): void {
+    if (nextProps.currentTrack !== this.props.currentTrack) {
+      this.playTrack(nextProps.currentTrack);
+    }
+    
+    this.setPlaying(nextProps.isPlaying);
   }
 
-  private getUserMusic() {
-    const token = 'BQD6KSFis0jllYEA1gx6wIVa_CjuQcGWJUcrjQHPKdkLyQaxeyvKr1pgzHpEzowHKDCYOI35qkTWRRx9LrwFhpZZyjKhn70LqSDyU6MGNzpy3kp1R3v0sjbqBKWLjKhqNliaZGxtyv-voIPS2Fyy3w';
+  private playTrack(track: Track) {
+    if (this.audio.src) {
+      this.audio.pause();
+    }
 
-    const spotifyApi = new SpotifyWebApi();
-    spotifyApi.setAccessToken(token);
+    if (track.meta.preview_url) {
+      this.audio.src = track.meta.preview_url;
+      this.audio.play();
+    } else {
+      this.audio.src = '';
+    }
+  }
 
-    // spotifyApi.getMyRecentlyPlayedTracks().then(res => console.log(res));
-    spotifyApi.getMySavedTracks({limit: 50}).then(res => console.log(res));
+  private setPlaying(isPlaying: boolean) {
+    if (!this.audio.src) {
+      return;
+    }
+
+    if (this.props.isPlaying && !isPlaying) {
+      this.audio.pause();
+    }
+    if (!this.props.isPlaying && isPlaying) {
+      this.audio.play();
+    }
+  }
+
+  private handleControlsClick() {
+    const isPlaying = this.props.isPlaying;
+    const action = playerActions.setPlaying(!isPlaying);
+
+    this.context.dispatch(action);
   }
 
   render() {
+    const track = this.props.currentTrack;
 
+    if (!track) {
+      return null;
+    }
+
+    const isPlayable = !!track.meta.preview_url;
 
     return (
       <div className="playerBar">
-          <span onClick={this.handleLoginClick}>login</span><br />
-          <span onClick={this.getUserMusic}>get info</span>
+          {isPlayable ? 
+            <div className="playerBar__control playerBar__control--pa" onClick={this.handleControlsClick}>
+              {this.props.isPlaying ? 
+                <PauseIcon className="playerBar__control-play-icon" /> :
+                <PlayIcon className="playerBar__control-play-icon" />
+              }
+            </div>
+          :
+            <div className="playerBar__control">
+              <PlayIcon className="playerBar__control-play-icon" />
+            </div>
+          }
+          <div className="playerBar__meta">
+            <div className="playerBar__meta-name">{track.name}</div>
+          </div>
+
+          <AuthControl />
       </div>
     );
   }
   
 }
+
+
+import { StoreState } from 'types';
+import { connect } from 'react-redux';
+
+
+interface ConnectedProps {
+
+}
+
+export const ConnectedPlayerBar = connect(
+  ({player}: StoreState, ownProps: ConnectedProps) => ({
+    currentTrack: player.currentTrack,
+    isPlaying: player.isPlaying,
+  }),
+)(PlayerBar as any);
+// TODO: fix typings
+

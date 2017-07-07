@@ -5,7 +5,7 @@ require('./app.scss');
 
 import { IntroPanel } from 'components/introPanel';
 import { ResultList } from 'components/resultList';
-import { PlayerBar } from 'components/playerBar';
+import { ConnectedPlayerBar } from 'components/playerBar';
 import { Graph } from 'components/graph/graph';
 import { QueryBar } from 'components/queryBar/queryBar';
 import { DataItem } from 'types';
@@ -21,14 +21,14 @@ export interface Props {
   queryItems: DataItem[];
 
   typeFilter: string[];
-  viewModus: ViewModus
+  viewModus: ViewModus;
 }
 
 export class App extends React.Component<Props, null> {
+
   static contextTypes = {
     dispatch: React.PropTypes.func.isRequired,
   };
-
   context: DispatchContext;
 
   constructor(props: Props) {
@@ -74,8 +74,13 @@ export class App extends React.Component<Props, null> {
 
   render() {
     const props = this.props;
+    const hasQueryItems = (props.queryItems.length > 0);
 
     const renderViewLink = (title: string, state: ViewModus) => {
+      if (!hasQueryItems) {
+        return null;
+      }
+
       return (
         <span 
           className={'app__view-link ' + (this.props.viewModus === state ? 'app__view-link--active' : '')}
@@ -90,13 +95,13 @@ export class App extends React.Component<Props, null> {
     };
 
     const renderMainView = () => {
-      if (this.props.queryItems.length < 1) {
+      if (!hasQueryItems) {
         return (
           <IntroPanel />
         );
       }
 
-      if (this.props.viewModus === ViewModus.LIST) {
+      if (props.viewModus === ViewModus.LIST) {
         return (
           <ResultList items={props.resultItems} />
         );
@@ -120,6 +125,7 @@ export class App extends React.Component<Props, null> {
             onChange={this.onTypeFilterChange}
             multi={true} clearable={false}
           />
+
           <div className="app__view-links">
             {renderViewLink('Liste', ViewModus.LIST)}
             {renderViewLink('Graph', ViewModus.GRAPH)}
@@ -128,7 +134,7 @@ export class App extends React.Component<Props, null> {
 
         {renderMainView()}
 
-        <PlayerBar />
+        <ConnectedPlayerBar />
       </div>
     );
   }
@@ -138,15 +144,17 @@ export class App extends React.Component<Props, null> {
 import { connect } from 'react-redux';
 import { StoreState, ViewModus } from 'types';
 
-export const ConnectedApp = connect(
-  ({ query, views }: StoreState) => {
-    return {
-      queryItems: query.queryItems,
-      resultItems: query.resultItems,
-      typeFilter: query.typeFilter,
-      viewModus: views.app.viewModus
-    };
-  },
-)(App as any);
-// TODO: fix typings
+export interface ConnectedProps extends Props {
 
+}
+
+export const ConnectedApp = connect(
+  ({ query, views }: StoreState, ownProps: ConnectedProps) => ({
+    resultItems: query.resultItems,
+    queryItems: query.queryItems,
+    typeFilter: query.typeFilter,
+    viewModus: views.app.viewModus
+  }),
+)(App as any);
+
+// TODO: fix typings

@@ -1,14 +1,16 @@
 
 import { QueryState } from 'reducers/query';
 import { ViewState } from 'reducers/views';
+import { PlayerState } from 'reducers/player';
 
 export enum ViewModus {
     LIST, GRAPH
 }
 
 export interface StoreState {
-    query: QueryState
-    views: ViewState
+    query: QueryState,
+    views: ViewState,
+    player: PlayerState,
 }
 
 export interface ImageData {
@@ -23,8 +25,17 @@ export interface DataItem {
     name: string;
     meta?: {
         uri?: string,
-        preview_url?: string,
         images?: ImageData[]
+    }
+}
+
+
+export interface Track extends DataItem {
+    type: 'track',
+    meta: {
+        uri: string,
+        images: ImageData[]
+        preview_url: string,
     }
 }
 
