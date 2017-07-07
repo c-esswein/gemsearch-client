@@ -2,7 +2,7 @@ import * as React from 'react';
 import { DispatchContext } from 'components/dispatchContextProvider';
 import { processServerResp } from 'api';
 import { DataItem } from 'types';
-import * as actions from 'actions';
+import * as queryActions from 'actions/query';
 import * as Autosuggest from 'react-autosuggest';
 
 require('./searchInput.scss');
@@ -64,7 +64,7 @@ export class SearchInput extends React.Component<Props, State> {
   }
 
   private onSuggestionSelected(e: React.UIEvent<Element>, { suggestion }) {
-    this.context.dispatch(actions.addQueryItem(suggestion));
+    this.context.dispatch(queryActions.addQueryItem(suggestion));
     
     this.setState({
       value: ''

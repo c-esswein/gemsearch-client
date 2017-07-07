@@ -5,11 +5,13 @@ require('./app.scss');
 
 import { IntroPanel } from 'components/introPanel';
 import { ResultList } from 'components/resultList';
+import { PlayerBar } from 'components/playerBar';
 import { Graph } from 'components/graph/graph';
 import { QueryBar } from 'components/queryBar/queryBar';
 import { DataItem } from 'types';
 import { processServerResp } from 'api';
-import * as actions from 'actions';
+import * as queryActions from 'actions/query';
+import * as viewActions from 'actions/views';
 import { DispatchContext } from 'components/dispatchContextProvider';
 import { GraphIcon, ListIcon } from 'icons';
 
@@ -19,7 +21,7 @@ export interface Props {
   queryItems: DataItem[];
 
   typeFilter: string[];
-  viewState: ViewState
+  viewModus: ViewModus
 }
 
 export class App extends React.Component<Props, null> {
@@ -57,28 +59,28 @@ export class App extends React.Component<Props, null> {
     }))
       .then(response => response.json())
       .then(processServerResp)
-      .then(data => this.context.dispatch(actions.receiveItems(data)));
+      .then(data => this.context.dispatch(queryActions.receiveItems(data)));
   }
 
-  handleViewChangeClick(viewState: ViewState) {
-    const viewChangeAction = actions.changeMainViewType(viewState);
+  handleViewChangeClick(viewState: ViewModus) {
+    const viewChangeAction = viewActions.changeMainViewType(viewState);
     this.context.dispatch(viewChangeAction);
   }
 
   onTypeFilterChange(filter: {value: string}[]) {
-    const filterAction = actions.changeTypeFilter(filter.map(item => item.value));
+    const filterAction = queryActions.changeTypeFilter(filter.map(item => item.value));
     this.context.dispatch(filterAction);
   }
 
   render() {
     const props = this.props;
 
-    const renderViewLink = (title: string, state: ViewState) => {
+    const renderViewLink = (title: string, state: ViewModus) => {
       return (
         <span 
-          className={'app__view-link ' + (this.props.viewState === state ? 'app__view-link--active' : '')}
+          className={'app__view-link ' + (this.props.viewModus === state ? 'app__view-link--active' : '')}
           onClick={this.handleViewChangeClick.bind(this, state)}>
-          {state === ViewState.GRAPH ? 
+          {state === ViewModus.GRAPH ? 
               <GraphIcon /> :
               <ListIcon />
           }
@@ -94,7 +96,7 @@ export class App extends React.Component<Props, null> {
         );
       }
 
-      if (this.props.viewState === ViewState.LIST) {
+      if (this.props.viewModus === ViewModus.LIST) {
         return (
           <ResultList items={props.resultItems} />
         );
@@ -119,12 +121,14 @@ export class App extends React.Component<Props, null> {
             multi={true} clearable={false}
           />
           <div className="app__view-links">
-            {renderViewLink('Liste', ViewState.LIST)}
-            {renderViewLink('Graph', ViewState.GRAPH)}
+            {renderViewLink('Liste', ViewModus.LIST)}
+            {renderViewLink('Graph', ViewModus.GRAPH)}
           </div>
         </div>
 
         {renderMainView()}
+
+        <PlayerBar />
       </div>
     );
   }
@@ -132,15 +136,15 @@ export class App extends React.Component<Props, null> {
 
 
 import { connect } from 'react-redux';
-import { StoreState, ViewState } from 'types';
+import { StoreState, ViewModus } from 'types';
 
 export const ConnectedApp = connect(
-  ({ queryItems, resultItems, typeFilter, views }: StoreState) => {
+  ({ query, views }: StoreState) => {
     return {
-      queryItems,
-      resultItems,
-      typeFilter,
-      viewState: views.app.viewState
+      queryItems: query.queryItems,
+      resultItems: query.resultItems,
+      typeFilter: query.typeFilter,
+      viewModus: views.app.viewModus
     };
   },
 )(App as any);

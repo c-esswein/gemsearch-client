@@ -134,10 +134,10 @@ export class Graph extends React.Component<Props, null> {
 
     this.shouldAnimate = true;
     this.animate();
-    
+    /*
     xFetch('/api/graph')
       .then(response => response.json())
-      .then(json => this.drawLines(json));
+      .then(json => this.drawLines(json));*/
   }
 
   /**

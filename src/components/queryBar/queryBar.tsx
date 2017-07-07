@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { DataItem } from 'types';
-import * as actions from 'actions';
+import * as queryActions from 'actions/query';
 import { processServerResp } from 'api';
 import { QueryItem } from 'components/queryBar/queryItem';
 import { SearchInput } from 'components/queryBar/searchInput';
@@ -41,7 +41,7 @@ export class QueryBar extends React.Component<Props, State> {
     e.preventDefault();
 
     this.queryItemInfo(this.state.itemAddId).
-      then(item => item && this.context.dispatch(actions.addQueryItem(item)));
+      then(item => item && this.context.dispatch(queryActions.addQueryItem(item)));
     this.setState({itemAddId: ''});
   }
 
@@ -59,13 +59,13 @@ export class QueryBar extends React.Component<Props, State> {
   }
 
   private handleRemoveItem(item: DataItem) {
-    this.context.dispatch(actions.removeQueryItem(item));
+    this.context.dispatch(queryActions.removeQueryItem(item));
   }
 
   private handleInputRemove() {
     if (this.props.queryItems.length > 0) {
       const lastItem = this.props.queryItems[this.props.queryItems.length - 1];
-      this.context.dispatch(actions.removeQueryItem(lastItem));
+      this.context.dispatch(queryActions.removeQueryItem(lastItem));
     }
   }
 

@@ -1,17 +1,14 @@
 
-export enum ViewState {
+import { QueryState } from 'reducers/query';
+import { ViewState } from 'reducers/views';
+
+export enum ViewModus {
     LIST, GRAPH
 }
 
 export interface StoreState {
-    queryItems: DataItem[];
-    resultItems: DataItem[];
-    typeFilter: string[];
-    views: {
-        app: {
-            viewState: ViewState;
-        }
-    }
+    query: QueryState
+    views: ViewState
 }
 
 export interface ImageData {

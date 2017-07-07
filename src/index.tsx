@@ -2,9 +2,9 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { ConnectedApp } from 'components/app';
 
-import { createStore, applyMiddleware } from 'redux';
-import { items } from 'reducers/index';
-import { StoreState, ViewState } from 'types/index';
+import { createStore, applyMiddleware, StoreEnhancer, compose } from 'redux';
+import { mainReducer } from 'reducers';
+import { StoreState, ViewModus } from 'types';
 import { Provider } from 'react-redux';
 import thunkMiddleware from 'redux-thunk';
 import { DispatchContextProvider } from 'components/dispatchContextProvider';
@@ -16,22 +16,20 @@ require('styles/react-autosuggest.scss'); // TODO scss import is not working
 require('styles/react-select.scss');
 
 function configureStore(initialState: StoreState) {
-  const store = createStore(items as any, initialState, applyMiddleware(thunkMiddleware));
+  const devToolsExtension: StoreEnhancer<any> = typeof window === 'object' && typeof window.devToolsExtension !== 'undefined' ? window.devToolsExtension() : f => f;
+
+  const enhancers = applyMiddleware(thunkMiddleware);
+  const composed = compose(enhancers, devToolsExtension);
+
+  const store = createStore(
+    mainReducer as any, // reducer
+    initialState, 
+    composed
+  );
   return store;
 }
 
-
-const store = configureStore({
-    queryItems: [],
-    resultItems: [],
-    typeFilter: ['track', 'artist'],
-    views: {
-      app: {
-        viewState: ViewState.LIST
-      }
-    }
-  }
-);
+const store = configureStore(undefined);
 
 
 const render = (App: React.ComponentClass<{}>) => {
@@ -66,4 +64,3 @@ if (module.hot) {
     },
   );
 }
-

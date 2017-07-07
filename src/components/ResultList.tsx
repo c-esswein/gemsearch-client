@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ResultItem } from 'components/resultItem';
 import { DataItem } from 'types';
-import * as actions from 'actions';
+import * as queryActions from 'actions/query';
 import { DispatchContext } from 'components/dispatchContextProvider';
 
 require('./resultList.scss');
@@ -39,6 +39,6 @@ export class ResultList extends React.Component<Props, null> {
   }
   
   private handleItemActionClick(item: DataItem) {
-    this.context.dispatch(actions.addQueryItem(item));
+    this.context.dispatch(queryActions.addQueryItem(item));
   }
 }

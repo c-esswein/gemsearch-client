@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { DataItem } from 'types';
+import { PlayIcon } from 'icons';
 
 require('./item.scss');
 
@@ -21,6 +22,15 @@ export class Item extends React.Component<Props, null> {
 
     if (item.meta && item.meta.images && item.meta.images.length > 0) {
       const imageVersion = item.meta.images.find(image => image.width === 300) || item.meta.images[0];
+
+      if (item.meta.uri) {
+        return (
+          <a className="item__image" href={item.meta.uri} title="View on Spotify" 
+            style={{backgroundImage: `url(${imageVersion.url})`}}>
+            <PlayIcon className="item__play-icon" />
+          </a>
+        );
+      }
       return (
         <div className="item__image" style={{backgroundImage: `url(${imageVersion.url})`}}></div>
       );

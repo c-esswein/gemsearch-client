@@ -67,6 +67,7 @@
     "redux": "^3.7.0",
     "redux-form": "^6.8.0",
     "redux-thunk": "^2.1.0",
+    "spotify-web-api-js": "^0.22.0",
     "style-loader": "^0.18.2",
     "three": "^0.85.2",
     "three-trackballcontrols": "0.0.5",
