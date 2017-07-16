@@ -1,6 +1,9 @@
 import * as React from 'react';
-import { DataItem } from 'types';
+import { DataItem, Track } from 'types';
 import { PlayIcon } from 'icons';
+import { DispatchContext } from 'components/dispatchContextProvider';
+import * as playerActions from 'actions/player';
+import * as viewActions from 'actions/views';
 
 require('./item.scss');
 
@@ -12,9 +15,31 @@ export interface Props {
 
 export class Item extends React.Component<Props, null> {
 
+  static contextTypes = {
+    dispatch: React.PropTypes.func.isRequired,
+  };
+  context: DispatchContext;
+
+
   constructor(props: Props) {
       super(props);
 
+      this.handlePlayClick = this.handlePlayClick.bind(this);
+      this.handleDetailClick = this.handleDetailClick.bind(this);
+  }
+
+  private handlePlayClick() {
+    const item = this.props.item;
+
+    this.context.dispatch(
+      playerActions.playTrack(item as Track)
+    );
+  }
+
+  private handleDetailClick() {
+    this.context.dispatch(
+      viewActions.openItemDetail(this.props.item)
+    );
   }
 
   renderImage() {
@@ -23,16 +48,17 @@ export class Item extends React.Component<Props, null> {
     if (item.meta && item.meta.images && item.meta.images.length > 0) {
       const imageVersion = item.meta.images.find(image => image.width === 300) || item.meta.images[0];
 
-      if (item.meta.uri) {
+      if (item.type === 'track' && item.meta.uri) {
         return (
-          <a className="item__image" href={item.meta.uri} title="View on Spotify" 
-            style={{backgroundImage: `url(${imageVersion.url})`}}>
-            <PlayIcon className="item__play-icon" />
-          </a>
+          <div className="item__image item__link" style={{backgroundImage: `url(${imageVersion.url})`}} onClick={this.handlePlayClick}>
+            {/*<div className="item__play" onClick={this.handlePlayClick}>*/}
+              <PlayIcon className="item__play-icon" />
+            {/*</div>*/}
+          </div>
         );
       }
       return (
-        <div className="item__image" style={{backgroundImage: `url(${imageVersion.url})`}}></div>
+        <div className="item__image" style={{backgroundImage: `url(${imageVersion.url})`}} onClick={this.handleDetailClick}></div>
       );
     }
 

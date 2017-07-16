@@ -5,15 +5,54 @@
     left: 0;
     right: 0;
     transform: translate3d(0, 0, 0);
-    
-    
-    min-height: 60px;
+    padding: 1rem;    
     background: #fff;
     opacity: .6;
     transition: all .3s;
+    display: flex;
 
     &:hover {
         opacity: 1;
+    }
+
+
+
+    // TODO: remove
+    .tmp__auth {
+        margin-left: auto;
+    }
+}
+
+.playerBar__control {
+    margin-left: 2em;
+    margin-right: 2em;
+    
+    &-play-icon {
+        fill: #ccc;
+        height: 2em;
+        width: 2em;
+    }
+}
+
+// song is playable
+.playerBar__control.playerBar__control--pa {
+    
+    .playerBar__control-play-icon {
+        fill: #000;
+        cursor: pointer;
+        transition: transform .4s;
+
+        &:hover {
+            transform: scale(1.2);
+        }
+    }
+}
+
+
+.playerBar__meta {
+
+    &-name {
+        font-weight: 600;
     }
 }
 

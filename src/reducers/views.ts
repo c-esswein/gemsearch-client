@@ -4,12 +4,19 @@ import { StoreState, DataItem, ViewModus } from 'types';
 export interface ViewState {
     app: {
         viewModus: ViewModus
+    },
+    itemDetail: {
+      isOpen: boolean,
+      item?: DataItem
     }
 }
 
 const initialState: ViewState = {
   app: {
     viewModus: ViewModus.LIST
+  },
+  itemDetail: {
+    isOpen: false
   }
 };
 
@@ -21,6 +28,23 @@ export function viewReducer(state: ViewState = initialState, action: Actions): V
           app: {
             ...state.app,
             viewModus: action.viewModus
+          }
+      };
+    case 'OPEN_ITEM_DETAIL':
+      return { 
+        ...state, 
+          itemDetail: {
+            ...state.itemDetail,
+            isOpen: true,
+            item: action.item
+          }
+      };
+    case 'CLOSE_ITEM_DETAIL':
+      return { 
+        ...state, 
+          itemDetail: {
+            ...state.itemDetail,
+            isOpen: false
           }
       };
     default:

@@ -23,6 +23,7 @@ export interface DataItem {
     type: ItemType;
     id: string;
     name: string;
+    embeddingIndex: number;
     meta?: {
         uri?: string,
         images?: ImageData[]

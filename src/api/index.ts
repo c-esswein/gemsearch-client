@@ -1,10 +1,10 @@
 
 
 export function processServerResp(response: any) {
-    if (response['success']) {
-        return response['data'];
+    if (response.success) {
+        return response.data;
     } else {
         alert('Error');
-        throw Error(response['errors']);
+        throw Error(response.errors);
     }
-};
+}

@@ -25,9 +25,11 @@ export class Graph extends React.Component<Props, null> {
   private mouse: {x: number, y: number};
   private INTERSECTED: boolean;
   private positions: Float32Array;
+  private colors: Float32Array;
   private particles: THREE.Points;
   private typeMapping: ItemType[];
   private raycaster: THREE.Raycaster;
+  private pointGeometry: THREE.BufferGeometry;
 
   private shouldAnimate: boolean = false;
 
@@ -35,10 +37,12 @@ export class Graph extends React.Component<Props, null> {
     super(props);
 
     this.handleMouseMove = this.handleMouseMove.bind(this);
+    this.handleClick = this.handleClick.bind(this);
+    this.onWindowResize = this.onWindowResize.bind(this);
   }
 
   componentDidMount() {
-    window.addEventListener('resize', this.onWindowResize.bind(this), false);
+    window.addEventListener('resize', this.onWindowResize, false);
 
     this.renderThreeScene(this.renderContainer);
 
@@ -67,7 +71,13 @@ export class Graph extends React.Component<Props, null> {
     this.shouldAnimate = false;
     this.renderer.dispose();
 
-    window.removeEventListener('resize', this.onWindowResize.bind(this), false);
+    window.removeEventListener('resize', this.onWindowResize, false);
+  }
+
+  componentWillReceiveProps(nextProps: Props): void {
+    if (nextProps.items !== this.props.items) {
+      this.navigateTo(nextProps.items);
+    }
   }
 
   private renderThreeScene(renderContainer: HTMLElement) {
@@ -130,6 +140,8 @@ export class Graph extends React.Component<Props, null> {
     this.scene.add(this.particles);
 
     this.positions = positions;
+    this.colors = colors;
+    this.pointGeometry = geometry;
     this.typeMapping = data.typeMapping;
 
     this.shouldAnimate = true;
@@ -152,6 +164,43 @@ export class Graph extends React.Component<Props, null> {
     const line = new THREE.LineSegments(geometry, material);
     this.scene.add(line);
   }
+
+  /**
+   * Navigates to first results of given items.
+   * @param items 
+   */
+  private navigateTo(items: DataItem[]) {
+    if (!this.positions) {
+      // data not loaded yet
+      // TODO: store...
+      return;
+    }
+    
+    const getPosition = (item: DataItem) => {
+      const i = items[0].embeddingIndex;
+      return new THREE.Vector3(
+        this.positions[i], this.positions[i + 1], this.positions[i + 2]
+      );
+    };
+
+    const resultPos = getPosition(items[0]);
+    const secondPos = getPosition(items[1]);
+
+    const direction = resultPos.clone().sub(secondPos).multiplyScalar(0.5);
+//    const cameraPos = resultPos.clone().add(direction);
+    const cameraPos = resultPos.clone();
+
+    // this.camera.position.set(cameraPos.x, cameraPos.y, cameraPos.z);
+    // this.camera.lookAt(resultPos);
+
+    // highlight first and second
+    const firstColor = new THREE.Color('#fb27a4');
+    firstColor.toArray(this.colors as any, items[0].embeddingIndex * 3);
+    
+    const secondColor = new THREE.Color('#795548');
+    firstColor.toArray(this.colors as any, items[1].embeddingIndex * 3);
+    (this.pointGeometry.attributes as any).color.needsUpdate = true;
+  }
   
   private handleMouseMove(event: React.MouseEvent<HTMLElement>) {
     // calculate relative position
@@ -166,7 +215,12 @@ export class Graph extends React.Component<Props, null> {
     this.mouse.y = - (clientY / height) * 2 + 1;
   }
 
+  private handleClick() {
+    console.log('clicked');
+  }
+
   private onWindowResize() {
+    this.setRendererSize();
     this.controls.handleResize();
   }
 
@@ -193,7 +247,8 @@ export class Graph extends React.Component<Props, null> {
     const intersects = this.raycaster.intersectObject(this.particles);
 
     if (intersects.length > 0) {
-      const type = this.typeMapping[intersects[0].index];
+      const intersectIndex = intersects[0].index;
+      const type = this.typeMapping[intersectIndex];
       console.log(type);
     }
 
@@ -212,7 +267,7 @@ export class Graph extends React.Component<Props, null> {
               </div>
             ))}
           </div>
-          <div className="graph__canvas" onMouseMove={this.handleMouseMove} ref={(el) => { this.renderContainer = el; }} />
+          <div className="graph__canvas" onMouseMove={this.handleMouseMove} onClick={this.handleClick} ref={(el) => { this.renderContainer = el; }} />
       </div>
    );
   }

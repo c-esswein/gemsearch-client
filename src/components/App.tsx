@@ -135,6 +135,8 @@ export class App extends React.Component<Props, null> {
         {renderMainView()}
 
         <ConnectedPlayerBar />
+
+        <ConnectedItemDetail />
       </div>
     );
   }
@@ -143,6 +145,7 @@ export class App extends React.Component<Props, null> {
 
 import { connect } from 'react-redux';
 import { StoreState, ViewModus } from 'types';
+import { ConnectedItemDetail } from 'components/itemDetail';
 
 export interface ConnectedProps extends Props {
 
