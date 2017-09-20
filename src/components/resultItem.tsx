@@ -22,7 +22,7 @@ export class ResultItem extends Item {
     const item = this.props.item;
 
     return (
-      <div className="item resultItem" key={item.id}>
+      <div className={'item resultItem item--' + item.type} key={item.id}>      
         <div className="item__type">{item.type}</div>
         {item.type !== 'tag' ? this.renderImage() : null}
         <div className="item__inner">

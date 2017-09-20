@@ -5,6 +5,7 @@ import { DataItem, ItemType } from 'types';
 import {TrackballControls} from 'misc/TrackballControls';
 import { xFetch } from 'utils';
 import { TypeColors } from 'constants/colors';
+import { ThreeScene } from 'components/graph/threeScene';
 
 require('./graph.scss');
 
@@ -15,14 +16,8 @@ export interface Props {
 /**
  * Three.js Graph visualization.
  */
-export class Graph extends React.Component<Props, null> {
+export class Graph extends ThreeScene<Props> {
 
-  private renderContainer: HTMLElement;
-  private renderer: THREE.WebGLRenderer;
-  private scene: THREE.Scene;
-  private camera: THREE.PerspectiveCamera;
-  private controls: THREE.TrackballControls;
-  private mouse: {x: number, y: number};
   private INTERSECTED: boolean;
   private positions: Float32Array;
   private colors: Float32Array;
@@ -31,47 +26,17 @@ export class Graph extends React.Component<Props, null> {
   private raycaster: THREE.Raycaster;
   private pointGeometry: THREE.BufferGeometry;
 
-  private shouldAnimate: boolean = false;
-
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
 
-    this.handleMouseMove = this.handleMouseMove.bind(this);
-    this.handleClick = this.handleClick.bind(this);
-    this.onWindowResize = this.onWindowResize.bind(this);
   }
 
   componentDidMount() {
-    window.addEventListener('resize', this.onWindowResize, false);
-
-    this.renderThreeScene(this.renderContainer);
+    super.componentDidMount();
 
     xFetch('/api/nodes')
       .then(response => response.json())
       .then(json => this.drawGraph(json));
-    /*this.drawGraph({
-      nodes: [
-        0, 0, 0, 
-        0, 1, 1, 
-        0, .5, .5,
-        1, .3, .3,
-      ],
-      typeMapping: ['track', 'track', 'track', 'artist', 'artist']
-    });
-
-    this.drawLines({
-      edges: [
-        0, 2,
-        1, 3,
-      ]
-    });*/
-  }
-
-  componentWillUnmount() {
-    this.shouldAnimate = false;
-    this.renderer.dispose();
-
-    window.removeEventListener('resize', this.onWindowResize, false);
   }
 
   componentWillReceiveProps(nextProps: Props): void {
@@ -80,27 +45,10 @@ export class Graph extends React.Component<Props, null> {
     }
   }
 
-  private renderThreeScene(renderContainer: HTMLElement) {
-    
-    this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
-    this.camera.position.y = 150;
-    this.camera.position.z = 350;
-    this.controls = new TrackballControls(this.camera, this.renderContainer);
-
-    this.controls.rotateSpeed = 1.0;
-    this.controls.zoomSpeed = 1.2;
-    this.controls.panSpeed = 0.8;
-    this.controls.dynamicDampingFactor = 0.3;
-    this.controls.addEventListener('change', this.renderGL.bind(this));
-    
-    this.renderer = new THREE.WebGLRenderer({ alpha: true });
-    this.renderer.setPixelRatio(window.devicePixelRatio);
-    this.setRendererSize();
-    renderContainer.appendChild(this.renderer.domElement);
+  /** @inheritDoc */
+  protected onThreeSceneCreated() {
     
     this.raycaster = new THREE.Raycaster();
-    this.mouse = new THREE.Vector2();
   }
 
   /**
@@ -144,8 +92,7 @@ export class Graph extends React.Component<Props, null> {
     this.pointGeometry = geometry;
     this.typeMapping = data.typeMapping;
 
-    this.shouldAnimate = true;
-    this.animate();
+    this.startAnimating();
     /*
     xFetch('/api/graph')
       .then(response => response.json())
@@ -202,47 +149,8 @@ export class Graph extends React.Component<Props, null> {
     (this.pointGeometry.attributes as any).color.needsUpdate = true;
   }
   
-  private handleMouseMove(event: React.MouseEvent<HTMLElement>) {
-    // calculate relative position
-    const elPos = event.currentTarget.getBoundingClientRect();
-    const clientX = event.clientX - elPos.left;
-    const clientY = event.clientY - elPos.top;
-    
-    const width = this.renderContainer.offsetWidth;
-    const height = this.renderContainer.offsetHeight;
-
-    this.mouse.x = (clientX / width) * 2 - 1;
-    this.mouse.y = - (clientY / height) * 2 + 1;
-  }
-
-  private handleClick() {
-    console.log('clicked');
-  }
-
-  private onWindowResize() {
-    this.setRendererSize();
-    this.controls.handleResize();
-  }
-
-  private setRendererSize() {
-    const width = this.renderContainer.offsetWidth;
-    let height = window.innerHeight - this.renderContainer.offsetTop;
-    height = Math.max(height, 300);
-
-    this.camera.aspect = width / height;
-    this.camera.updateProjectionMatrix();
-    this.renderer.setSize(width, height);
-  }
-
-  private animate() {
-    if (this.shouldAnimate) {
-      this.controls.update();
-      this.renderGL();
-      requestAnimationFrame(this.animate.bind(this));
-    }
-  }
-
-  private renderGL() {
+  /** @inheritDoc */
+  protected onAnimate() {
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const intersects = this.raycaster.intersectObject(this.particles);
 
@@ -252,23 +160,5 @@ export class Graph extends React.Component<Props, null> {
       console.log(type);
     }
 
-    this.renderer.render(this.scene, this.camera);
-  }
-
-  public render() {
-
-    // TODO: render type colors in type filter and remove hints here
-    return (
-      <div className="graph">
-          <div className="graph__type-colors">
-            {Object.keys(TypeColors).map(type => (
-              <div className="graph__type-color" key={type} style={{color: '#' + TypeColors[type].toString(16)}}>
-                {type}
-              </div>
-            ))}
-          </div>
-          <div className="graph__canvas" onMouseMove={this.handleMouseMove} onClick={this.handleClick} ref={(el) => { this.renderContainer = el; }} />
-      </div>
-   );
   }
 }

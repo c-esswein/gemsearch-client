@@ -14,4 +14,13 @@
     .item__image {
         max-width: 100%;
     }
+
+    &.item--artist .item__image {
+        cursor: pointer;
+        transition: all .4s;
+
+        &:hover {
+            opacity: .4;
+        }
+    }
 }

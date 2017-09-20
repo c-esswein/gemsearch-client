@@ -24,6 +24,7 @@ export interface DataItem {
     id: string;
     name: string;
     embeddingIndex: number;
+    position: number[];
     meta?: {
         uri?: string,
         images?: ImageData[]

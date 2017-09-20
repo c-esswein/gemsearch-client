@@ -107,7 +107,8 @@ export class App extends React.Component<Props, null> {
         );
       } else {
         return (
-          <Graph items={props.resultItems} />
+          <DetailGraph items={props.resultItems} />
+          // <Graph items={props.resultItems} />
         );        
       }
     };
@@ -146,6 +147,7 @@ export class App extends React.Component<Props, null> {
 import { connect } from 'react-redux';
 import { StoreState, ViewModus } from 'types';
 import { ConnectedItemDetail } from 'components/itemDetail';
+import { DetailGraph } from 'components/graph/detailGraph';
 
 export interface ConnectedProps extends Props {
 
