@@ -13,7 +13,7 @@ export interface ViewState {
 
 const initialState: ViewState = {
   app: {
-    viewModus: ViewModus.LIST
+    viewModus: ViewModus.GRAPH,
   },
   itemDetail: {
     isOpen: false

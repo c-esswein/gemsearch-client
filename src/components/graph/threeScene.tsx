@@ -30,7 +30,8 @@ export class ThreeScene<T> extends React.Component<T, State> {
     this.handleMouseMove = this.handleMouseMove.bind(this);
     this.onWindowResize = this.onWindowResize.bind(this);
     this.animate_ = this.animate_.bind(this);
-    this.handleCanvasClick = this.handleCanvasClick.bind(this);    
+    this.handleCanvasClick = this.handleCanvasClick.bind(this);
+    this.handleControlUpdate = this.handleControlUpdate.bind(this);
 
     this.state = {
       showPointerCursor: false
@@ -46,6 +47,7 @@ export class ThreeScene<T> extends React.Component<T, State> {
   componentWillUnmount() {
     this.shouldAnimate = false;
     this.renderer.dispose();
+    (this.controls as any).dispose(); // dispose is not in @type file...
 
     window.removeEventListener('resize', this.onWindowResize, false);
   }
@@ -55,13 +57,13 @@ export class ThreeScene<T> extends React.Component<T, State> {
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
     this.camera.position.y = 150;
     this.camera.position.z = 350;
+    
     this.controls = new TrackballControls(this.camera, this.renderContainer);
-
+    this.controls.addEventListener('change', this.handleControlUpdate);
     this.controls.rotateSpeed = 1.0;
     this.controls.zoomSpeed = 1.2;
     this.controls.panSpeed = 0.8;
     this.controls.dynamicDampingFactor = 0.3;
-    this.controls.addEventListener('change', this.renderGL.bind(this));
     
     this.renderer = new THREE.WebGLRenderer({ alpha: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -91,8 +93,15 @@ export class ThreeScene<T> extends React.Component<T, State> {
     this.mouse.y = - (clientY / height) * 2 + 1;
   }
   
+  /**
+   * Handles click on canvas. Override in subclasses to add interactions.
+   */
   protected handleCanvasClick(event: React.MouseEvent<HTMLElement>) {
-    console.log('bnnnndd');
+    
+  }
+
+  protected handleControlUpdate() {
+    this.renderGL();
   }
 
   private onWindowResize() {

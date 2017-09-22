@@ -19,11 +19,18 @@ export interface ImageData {
     url: string
 }
 
+export interface QueryItem {
+    type: ItemType;
+    id: string;
+    name: string;
+}
+
 export interface DataItem {
     type: ItemType;
     id: string;
     name: string;
     embeddingIndex: number;
+    /** position of item in 3D, coordinates are relative to queryVec */
     position: number[];
     meta?: {
         uri?: string,

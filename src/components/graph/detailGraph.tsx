@@ -7,6 +7,7 @@ import { xFetch } from 'utils';
 import { TypeColors } from 'constants/colors';
 import { ThreeScene } from 'components/graph/threeScene';
 import * as viewActions from 'actions/views';
+import { GraphItem } from 'components/graph/graphItem';
 
 
 require('./graph.scss');
@@ -15,11 +16,13 @@ export interface Props {
   items: DataItem[];
 }
 
+
 /**
  * Three.js Graph visualization.
  */
 export class DetailGraph extends ThreeScene<Props> {
 
+  private items: GraphItem[];
   private meshItems: THREE.Object3D[];
   private raycaster: THREE.Raycaster;
   private intersectionId: string; 
@@ -57,44 +60,23 @@ export class DetailGraph extends ThreeScene<Props> {
    * Renders given items as 3D objects on scene.
    */
   private renderItems(items: DataItem[]) {
-    if (this.meshItems) {
-      this.meshItems.forEach(child => {
-        this.scene.remove(child);
-      });
-    }
-    this.meshItems = [];
-
-    const loader = new THREE.TextureLoader();
-    loader.crossOrigin = 'anonymous';
-    items.forEach(item => {
-
-      // find smallest image
-      const imageVersion = item.meta.images.length > 0 ? 
-        (item.meta.images.find(image => image.width === 160) || item.meta.images[0])
-        : {url: ''};
-      const itemColor = TypeColors[item.type] || 0xFFFFFF;
-      console.log(TypeColors, item.type, itemColor);
-      const material = new THREE.PointsMaterial({
-        color: itemColor,
-        size: 20,
-        // TODO: reenable item image + make sure color is shown despite image
-        // map: loader.load(imageVersion.url),
-      });
-
-      const geometry = new THREE.Geometry();
-      const pos = new THREE.Vector3();
-      pos.fromArray(item.position);
-      geometry.vertices.push(pos);
-      
-      const scalingFac = 300;
-      const mesh = new THREE.Points(geometry, material);
-      mesh.position.fromArray(item.position);
-      mesh.position.multiplyScalar(scalingFac);
-      mesh.name = item.id;
-
-      this.meshItems.push(mesh);
-      this.scene.add(mesh);
+    // clear scene
+    this.scene.children.forEach(child => {
+      this.scene.remove(child);
     });
+    this.meshItems = [];
+    this.items = [];
+
+    items.forEach(dataItem => {
+      const item = new GraphItem(dataItem);
+      this.items.push(item);
+
+      // create obj to render
+      const sceneObj = item.getSceneObj();
+      this.meshItems.push(sceneObj.children[0]);
+      this.scene.add(sceneObj);
+    });
+
   }
   
   /** @inheritDoc */
@@ -114,6 +96,15 @@ export class DetailGraph extends ThreeScene<Props> {
       this.setPointerCursor(false);
     }
 
+  }
+
+  /** @inheritDoc */
+  protected handleControlUpdate() {
+    super.handleControlUpdate();
+
+    // rotate scene elements to always face camera
+    const cameraPos = this.camera.position;
+    this.scene.children.forEach((mesh) => mesh.lookAt(cameraPos));
   }
 
   /**

@@ -1,8 +1,8 @@
 import { Actions } from 'actions';
-import { StoreState, DataItem } from 'types';
+import { StoreState, DataItem, QueryItem } from 'types';
 
 export interface QueryState {
-    queryItems: DataItem[];
+    queryItems: QueryItem[];
     resultItems: DataItem[];
     typeFilter: string[];
 }

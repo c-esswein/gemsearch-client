@@ -9,7 +9,7 @@ import { ConnectedPlayerBar } from 'components/playerBar';
 import { Graph } from 'components/graph/graph';
 import { QueryBar } from 'components/queryBar/queryBar';
 import { DataItem } from 'types';
-import { processServerResp } from 'api';
+import { queryForItems } from 'api';
 import * as queryActions from 'actions/query';
 import * as viewActions from 'actions/views';
 import { DispatchContext } from 'components/dispatchContextProvider';
@@ -44,30 +44,17 @@ export class App extends React.Component<Props, null> {
     }
   }
 
-  queryForItems(query: DataItem[], typeFilter: string[]) {
-    const queryIds = query.map(item => item.id);
-
-    function queryParams(params: Object) {
-      return Object.keys(params)
-          .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
-          .join('&');
-    }
-
-    fetch('/api/query?' + queryParams({
-      'ids': queryIds.join('|'),
-      'types': typeFilter.join('|')
-    }))
-      .then(response => response.json())
-      .then(processServerResp)
+  private queryForItems(query: DataItem[], typeFilter: string[]) {
+    queryForItems(query, typeFilter)
       .then(data => this.context.dispatch(queryActions.receiveItems(data)));
   }
 
-  handleViewChangeClick(viewState: ViewModus) {
+  private handleViewChangeClick(viewState: ViewModus) {
     const viewChangeAction = viewActions.changeMainViewType(viewState);
     this.context.dispatch(viewChangeAction);
   }
 
-  onTypeFilterChange(filter: {value: string}[]) {
+  private onTypeFilterChange(filter: {value: string}[]) {
     const filterAction = queryActions.changeTypeFilter(filter.map(item => item.value));
     this.context.dispatch(filterAction);
   }
