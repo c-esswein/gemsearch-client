@@ -33,30 +33,53 @@ function generateRandomString(length) {
     return text;
 }
 
-export async function getAuthStatus() {
+
+export interface SpotifyUser {
+    display_name: string,
+    id: string,
+    images: ImageData[],
+}
+
+/**
+ * Returns user profile. Throws exception if no token is set.
+ * 
+ */
+function getUserInfo(): Promise<SpotifyUser> {
+    const accessToken = getAccessToken();
+
+    if (!accessToken) {
+        throw new Error('access token is not set');
+    }
+
+    return fetch('https://api.spotify.com/v1/me', {
+        headers: {
+            'Authorization': 'Bearer ' + accessToken
+        }
+    }).then(response => response.json() as Promise<SpotifyUser>);
+}
+
+/**
+ * Checks url for redirect auth tokens. If they are present, access token is 
+ * stored and hash params are cleared.
+ */
+export function checkUrlForAuth() {
     const params = getHashParams();
-    const access_token = params.access_token,
+    const accessToken = params.access_token,
         state = params.state,
         storedState = localStorage.getItem(stateKey);
 
-    if (access_token && (state == null || state !== storedState)) {
-        throw Error('There was an error during the authentication');
+    if (accessToken && (state == null || state !== storedState)) {
+        throw new Error('There was an error during the authentication');
     } else {
         localStorage.removeItem(stateKey);
-        localStorage.setItem(stateKey + '_access-token', access_token);
-        if (access_token) {
-            return fetch('https://api.spotify.com/v1/me', {
-                headers: {
-                    'Authorization': 'Bearer ' + access_token
-                }
-            }).then(response => {
-                console.log(response);
-                return response;      
-            });
-        } else {
-            return false;
-        }
+        localStorage.setItem(stateKey + '_access-token', accessToken);
+        // remove hash from url
+        document.location.hash = '';
     }
+}
+
+export function getAccessToken() {
+    return localStorage.getItem(stateKey + '_access-token');
 }
 
 

@@ -76,7 +76,13 @@ export class PlayerBar extends React.Component<Props, null> {
     const track = this.props.currentTrack;
 
     if (!track) {
-      return null;
+      // TODO: remove bar again
+      // return null;
+      return (
+        <div className="playerBar">
+          <AuthControl />          
+        </div>
+      );      
     }
 
     const isPlayable = !!track.meta.preview_url;

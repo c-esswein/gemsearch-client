@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { getAuthStatus, authorize } from 'api/spotify';
+import { authorize } from 'api/spotify';
 import * as SpotifyWebApi from 'spotify-web-api-js';
 
 
@@ -16,31 +16,45 @@ export class AuthControl extends React.Component<Props, null> {
   }
 
   private handleLoginClick() {
-    getAuthStatus().then(code => {
+    alert('not active');
+    /* getAuthStatus().then(code => {
       console.log(code);
 
       if (!code) {
 
         authorize();
+      } else {
       }
-    });
+    }); */
   }
 
   private getUserMusic() {
-    const token = 'BQD6KSFis0jllYEA1gx6wIVa_CjuQcGWJUcrjQHPKdkLyQaxeyvKr1pgzHpEzowHKDCYOI35qkTWRRx9LrwFhpZZyjKhn70LqSDyU6MGNzpy3kp1R3v0sjbqBKWLjKhqNliaZGxtyv-voIPS2Fyy3w';
+    /* const scopes = ['user-read-private', 'user-read-email'],
+                  redirectUri = 'https://example.com/callback',
+                  clientId = '5fe01282e44241328a84e7c5cc169165',
+                  state = 'some-state-of-my-choice';
 
-    const spotifyApi = new SpotifyWebApi();
-    spotifyApi.setAccessToken(token);
+    // Setting credentials can be done in the wrapper's constructor, or using the API object's setters.
+    const spotifyApi = new SpotifyWebApi({
+      redirectUri : redirectUri,
+      clientId : clientId
+    });
+
+    // Create the authorization URL
+    const authorizeURL = spotifyApi.createAuthorizeURL(scopes, state);
+
+    console.log(authorizeURL); */
+
 
     // spotifyApi.getMyRecentlyPlayedTracks().then(res => console.log(res));
-    spotifyApi.getMySavedTracks({limit: 50}).then(res => console.log(res));
+    // spotifyApi.getMySavedTracks({limit: 50}).then(res => console.log(res));
   }
 
   render() {
     return (
         <div className="tmp__auth">
-            <span onClick={this.handleLoginClick}>login</span><br />
-            <span onClick={this.getUserMusic}>get info</span>
+            <button onClick={this.handleLoginClick}>login</button><br />
+            <button onClick={this.getUserMusic}>get info</button>
         </div>
     );
   }
