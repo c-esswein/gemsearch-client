@@ -1,9 +1,11 @@
 import { Actions } from 'actions';
 import { StoreState, DataItem, QueryItem } from 'types';
+import { QueryServerResult } from 'api/query';
 
 export interface QueryState {
     queryItems: QueryItem[];
     resultItems: DataItem[];
+    result: QueryServerResult;
     typeFilter: string[];
 }
 
@@ -11,6 +13,7 @@ const initialState: QueryState = {
   queryItems: [],
   resultItems: [],
   typeFilter: ['track', 'artist'],
+  result: null,
 };
 
 export function queryReducer(state: QueryState = initialState, action: Actions): QueryState {
@@ -33,7 +36,8 @@ export function queryReducer(state: QueryState = initialState, action: Actions):
     case 'RECEIVE_ITEMS':
       return { 
         ...state, 
-        resultItems: action.response as DataItem[]
+        resultItems: action.response.data,
+        result: action.response,
       };
     case 'TYPE_FILTER_CHANGE':
       return { 

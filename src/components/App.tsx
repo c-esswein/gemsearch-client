@@ -9,7 +9,7 @@ import { ConnectedPlayerBar } from 'components/playerBar';
 import { Graph } from 'components/graph/graph';
 import { QueryBar } from 'components/queryBar/queryBar';
 import { DataItem } from 'types';
-import { queryForItems } from 'api';
+import { queryForItems, QueryServerResult } from 'api/query';
 import * as queryActions from 'actions/query';
 import * as viewActions from 'actions/views';
 import { DispatchContext } from 'components/dispatchContextProvider';
@@ -18,6 +18,7 @@ import { GraphIcon, ListIcon } from 'icons';
 
 export interface Props {
   resultItems: DataItem[];
+  result: QueryServerResult;
   queryItems: DataItem[];
 
   typeFilter: string[];
@@ -94,7 +95,7 @@ export class App extends React.Component<Props, null> {
         );
       } else {
         return (
-          <DetailGraph items={props.resultItems} />
+          <DetailGraph result={props.result} />
           // <Graph items={props.resultItems} />
         );        
       }
@@ -143,6 +144,7 @@ export interface ConnectedProps extends Props {
 export const ConnectedApp = connect(
   ({ query, views }: StoreState, ownProps: ConnectedProps) => ({
     resultItems: query.resultItems,
+    result: query.result,
     queryItems: query.queryItems,
     typeFilter: query.typeFilter,
     viewModus: views.app.viewModus

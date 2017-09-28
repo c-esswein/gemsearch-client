@@ -3,12 +3,15 @@ import * as React from 'react';
 import * as THREE from 'three';
 import { TrackballControls } from 'misc/TrackballControls';
 import { TypeColors } from 'constants/colors';
+import { LAYOUT_CONFIG } from 'components/graph';
 
 require('./graph.scss');
 
 interface State {
   showPointerCursor: boolean;
 }
+
+const DEBUG = true;
 
 /**
  * Base class for creating three js scenes.
@@ -148,6 +151,30 @@ export class ThreeScene<T> extends React.Component<T, State> {
 
   private renderGL() {
     this.renderer.render(this.scene, this.camera);
+  }
+
+  public zoomToFit(boundingBox: number[][]) {
+    DEBUG && console.log('threeScene: zoom to fit', boundingBox);
+
+    const aspect = this.camera.aspect;
+    const fov = Math.tan(Math.PI * this.camera.fov / 360);
+    
+    const maxAbsVal = (arr) => Math.max.apply(null, arr.map(Math.abs));
+    let maxDim = Math.max(maxAbsVal(boundingBox[0].slice(0, -1)), maxAbsVal(boundingBox[1].slice(0, -1)));
+    maxDim *= 2;
+    maxDim *= LAYOUT_CONFIG.scalingFac;
+    maxDim *= 1.1;
+
+    const distance = maxDim/ 2 / aspect / fov;
+    const cameraPosition = new THREE.Vector3(
+      0,
+      0,
+      distance
+    );
+    
+    this.camera.position.copy(cameraPosition);
+    this.camera.lookAt(new THREE.Vector3(0, 0, 0));
+    DEBUG && console.log('threeScene: new camera position', this.camera.position);
   }
 
 

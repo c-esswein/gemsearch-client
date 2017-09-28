@@ -1,6 +1,7 @@
 import { DataItem } from '../types';
+import { QueryServerResult } from 'api/query';
 
-export type Actions = 
+export type Actions =
     AddQueryItemAction | RemoveQueryItemAction | QueryForItemsAction | 
     ReceiveItemsAction | ChangeTypeFilterAction;
 
@@ -39,9 +40,9 @@ export function queryForItems(query: DataItem[]): QueryForItemsAction {
 
 export interface ReceiveItemsAction {
     type: 'RECEIVE_ITEMS';
-    response: Object;
+    response: QueryServerResult;
 }
-export function receiveItems(response: Object): ReceiveItemsAction {
+export function receiveItems(response: QueryServerResult): ReceiveItemsAction {
     return {
         type: 'RECEIVE_ITEMS',
         response

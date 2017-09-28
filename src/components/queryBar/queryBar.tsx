@@ -49,8 +49,8 @@ export class QueryBar extends React.Component<Props, State> {
     return fetch('/api/object/' + id.trim())
       .then(response => response.json())
       .then(processServerResp)
-      .then(function(result: DataItem[]) {
-        if (result.length > 0) {
+      .then((result: {data: DataItem[]}) => {
+        if (result.data.length > 0) {
           return result[0];
         }
         alert('No Item found.');

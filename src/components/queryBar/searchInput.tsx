@@ -51,7 +51,7 @@ export class SearchInput extends React.Component<Props, State> {
       .then(processServerResp)
       .then(result => {
         this.setState({
-          suggestions: result
+          suggestions: result.data
         });
       });
   }
