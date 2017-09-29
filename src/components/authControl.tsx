@@ -1,61 +1,64 @@
 import * as React from 'react';
 
-import { authorize } from 'api/spotify';
+import * as spotifyApi from 'api/spotify';
 import * as SpotifyWebApi from 'spotify-web-api-js';
-
+import { DispatchContext } from 'components/dispatchContextProvider';
+import { clearCurrentUser, setCurrentUser } from 'actions/user';
+import { syncUser } from 'api/user';
 
 export interface Props {
+  user: spotifyApi.SpotifyUser | null;
 }
 
 export class AuthControl extends React.Component<Props, null> {
+
+  static contextTypes = {
+    dispatch: React.PropTypes.func.isRequired,
+  };
+  
+  context: DispatchContext;
 
   constructor(props: Props) {
     super(props);
 
     this.handleLoginClick = this.handleLoginClick.bind(this);
+    this.handleLogoutClick = this.handleLogoutClick.bind(this);
+    this.handleSyncClick = this.handleSyncClick.bind(this);
   }
 
-  private handleLoginClick() {
-    alert('not active');
-    /* getAuthStatus().then(code => {
-      console.log(code);
-
-      if (!code) {
-
-        authorize();
-      } else {
-      }
-    }); */
+  private async handleLoginClick() {
+    spotifyApi.authorize();
   }
 
-  private getUserMusic() {
-    /* const scopes = ['user-read-private', 'user-read-email'],
-                  redirectUri = 'https://example.com/callback',
-                  clientId = '5fe01282e44241328a84e7c5cc169165',
-                  state = 'some-state-of-my-choice';
+  private handleLogoutClick() {
+    spotifyApi.logout();
+    this.context.dispatch(clearCurrentUser());
+  }
 
-    // Setting credentials can be done in the wrapper's constructor, or using the API object's setters.
-    const spotifyApi = new SpotifyWebApi({
-      redirectUri : redirectUri,
-      clientId : clientId
+  private handleSyncClick() {
+    const token = spotifyApi.getAccessToken();
+    syncUser(token).then(response => {
+      alert('sync done');
     });
-
-    // Create the authorization URL
-    const authorizeURL = spotifyApi.createAuthorizeURL(scopes, state);
-
-    console.log(authorizeURL); */
-
-
-    // spotifyApi.getMyRecentlyPlayedTracks().then(res => console.log(res));
-    // spotifyApi.getMySavedTracks({limit: 50}).then(res => console.log(res));
   }
 
   render() {
-    return (
+    const {user} = this.props;
+
+    if (user !== null) {
+      return (
         <div className="tmp__auth">
-            <button onClick={this.handleLoginClick}>login</button><br />
-            <button onClick={this.getUserMusic}>get info</button>
+          Logged in as: {user.display_name}
+          <button onClick={this.handleLogoutClick}>logout</button><br />
+          <button onClick={this.handleSyncClick}>sync lib</button>
         </div>
+      );
+    }
+
+    return (
+      <div className="tmp__auth">
+        <button onClick={this.handleLoginClick}>login</button><br />
+      </div>
     );
   }
   

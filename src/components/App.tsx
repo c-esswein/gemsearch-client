@@ -14,6 +14,12 @@ import * as queryActions from 'actions/query';
 import * as viewActions from 'actions/views';
 import { DispatchContext } from 'components/dispatchContextProvider';
 import { GraphIcon, ListIcon } from 'icons';
+import { ConnectedItemDetail } from 'components/itemDetail';
+import { DetailGraph } from 'components/graph/detailGraph';
+import * as spotifyApi from 'api/spotify';
+import { setCurrentUser } from 'actions/user';
+import { connect } from 'react-redux';
+import { StoreState, ViewModus } from 'types';
 
 
 export interface Props {
@@ -36,6 +42,21 @@ export class App extends React.Component<Props, null> {
     super(props);
 
     this.onTypeFilterChange = this.onTypeFilterChange.bind(this);
+  }
+
+  componentDidMount(): void {
+    // check for spotify auth
+    if (spotifyApi.checkUrlForAuth() || spotifyApi.getAccessToken()) {
+      try {
+        spotifyApi.getUserInfo().then(user => {
+          this.context.dispatch(setCurrentUser(user));      
+        });
+      } catch (ex) {
+        console.error(ex);
+        alert('spotify auth error');
+      }
+      
+    }
   }
 
   componentWillReceiveProps(nextProps: Props) {
@@ -132,10 +153,6 @@ export class App extends React.Component<Props, null> {
 }
 
 
-import { connect } from 'react-redux';
-import { StoreState, ViewModus } from 'types';
-import { ConnectedItemDetail } from 'components/itemDetail';
-import { DetailGraph } from 'components/graph/detailGraph';
 
 export interface ConnectedProps extends Props {
 

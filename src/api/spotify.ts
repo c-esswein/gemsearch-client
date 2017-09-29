@@ -44,7 +44,7 @@ export interface SpotifyUser {
  * Returns user profile. Throws exception if no token is set.
  * 
  */
-function getUserInfo(): Promise<SpotifyUser> {
+export function getUserInfo(): Promise<SpotifyUser> {
     const accessToken = getAccessToken();
 
     if (!accessToken) {
@@ -55,7 +55,18 @@ function getUserInfo(): Promise<SpotifyUser> {
         headers: {
             'Authorization': 'Bearer ' + accessToken
         }
-    }).then(response => response.json() as Promise<SpotifyUser>);
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (!result) {
+            throw new Error('no spotify result object');
+        }
+        if (result.error) {
+            throw new Error('spotify error: ' + JSON.stringify(result.error));
+        }
+
+        return result as Promise<SpotifyUser>;
+    });
 }
 
 /**
@@ -68,18 +79,32 @@ export function checkUrlForAuth() {
         state = params.state,
         storedState = localStorage.getItem(stateKey);
 
-    if (accessToken && (state == null || state !== storedState)) {
+    if (!accessToken) {
+        return false;
+    }
+
+    if (state == null || state !== storedState) {
         throw new Error('There was an error during the authentication');
     } else {
-        localStorage.removeItem(stateKey);
         localStorage.setItem(stateKey + '_access-token', accessToken);
-        // remove hash from url
-        document.location.hash = '';
     }
+
+    localStorage.removeItem(stateKey);
+    // remove hash from url
+    document.location.hash = '';
+
+    return true;
 }
 
 export function getAccessToken() {
     return localStorage.getItem(stateKey + '_access-token');
+}
+
+/**
+ * Removes access token from local storage.
+ */
+export function logout() {
+    localStorage.removeItem(stateKey + '_access-token');
 }
 
 

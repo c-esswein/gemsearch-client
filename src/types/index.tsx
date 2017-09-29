@@ -2,6 +2,7 @@
 import { QueryState } from 'reducers/query';
 import { ViewState } from 'reducers/views';
 import { PlayerState } from 'reducers/player';
+import { UserState } from 'reducers/user';
 
 export enum ViewModus {
     LIST, GRAPH
@@ -11,6 +12,7 @@ export interface StoreState {
     query: QueryState,
     views: ViewState,
     player: PlayerState,
+    user: UserState,
 }
 
 export interface ImageData {

@@ -12,6 +12,7 @@ require('./playerBar.scss');
 export interface Props {
   currentTrack: Track,
   isPlaying: boolean,
+  user: SpotifyUser,
 }
 
 export class PlayerBar extends React.Component<Props, null> {
@@ -80,7 +81,7 @@ export class PlayerBar extends React.Component<Props, null> {
       // return null;
       return (
         <div className="playerBar">
-          <AuthControl />          
+          <AuthControl user={this.props.user} />          
         </div>
       );      
     }
@@ -105,7 +106,7 @@ export class PlayerBar extends React.Component<Props, null> {
             <div className="playerBar__meta-name">{track.name}</div>
           </div>
 
-          <AuthControl />
+          <AuthControl user={this.props.user} />                    
       </div>
     );
   }
@@ -115,6 +116,7 @@ export class PlayerBar extends React.Component<Props, null> {
 
 import { StoreState } from 'types';
 import { connect } from 'react-redux';
+import { SpotifyUser } from 'api/spotify';
 
 
 interface ConnectedProps {
@@ -122,9 +124,10 @@ interface ConnectedProps {
 }
 
 export const ConnectedPlayerBar = connect(
-  ({player}: StoreState, ownProps: ConnectedProps) => ({
+  ({player, user}: StoreState, ownProps: ConnectedProps) => ({
     currentTrack: player.currentTrack,
     isPlaying: player.isPlaying,
+    user: user.currentUser,
   }),
 )(PlayerBar as any);
 // TODO: fix typings
