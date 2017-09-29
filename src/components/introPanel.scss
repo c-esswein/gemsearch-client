@@ -1,4 +1,87 @@
+@import "constants.scss";
 
 .introPanel {
     
+    &__hd {
+        text-align: center;
+        font-size: 4em;
+        font-weight: 200;
+        position: relative;
+        margin-bottom: 2em;
+
+        &:after {
+            content: '';
+            position: absolute;
+            bottom: -0.3em;
+            left: 50%;
+            margin-left: -1em;
+            width: 2em;
+            border-bottom: 0.1em solid $colorActive;
+        }
+    }
 }
+
+.introPanel__item {
+    max-width: 1300px;
+    margin: 4em auto;
+    display: flex;
+    flex-wrap: wrap;
+    
+    // intro animation
+    &.introPanel__anim-appear-active {
+        transition: all .5s;
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+        
+        .introPanel__item-hd {
+            &:after {
+                transition: transform .3s .3s;
+                transform: scaleY(1);
+            }
+        }
+    }
+    &.introPanel__anim-appear {
+        opacity: 0;
+        transform: translate3d(0, 5%, 0);
+
+        .introPanel__item-hd {
+            &:after {
+                transform: scaleY(0);
+            }
+        }
+    }
+
+    &-text {
+        width: 40%;
+
+        @media only screen and (max-width: 700px) {
+            width: 100%;
+        }
+
+        &.right { // TODO: remove for img version
+            margin-left: 60%;
+        }
+    
+    }
+
+    &-hd {
+        font-size: 2.5em;
+        margin-bottom: .8em;
+        position: relative;
+
+        &:after {
+            content: '';
+            position: absolute;
+            bottom: -0.2em;
+            left: 0;
+            width: 1.2em;
+            border-bottom: 0.08em solid $colorActive;
+        }
+    }
+
+    p {
+        line-height: 1.6;
+    }
+
+}
+

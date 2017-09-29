@@ -128,7 +128,7 @@ export class App extends React.Component<Props, null> {
       <div className="app">
         <QueryBar queryItems={props.queryItems} />
         
-        <div className="app-wrap app__filter">
+        <div className="app__filter">
           <Select
             value={props.typeFilter}
             options={typeOptions}

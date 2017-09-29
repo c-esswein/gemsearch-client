@@ -1,12 +1,14 @@
 
+@import "constants.scss";
+
 .searchInput {
     flex: 1;
 
     .react-autosuggest__input {
-        color: #fff;
+        color: $colorBlack;
         background: none;
         font-family: inherit;
-        font-size: 3em;
+        font-size: 2.5em;
         border: none;
         width: 100%;
         box-sizing: border-box;

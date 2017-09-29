@@ -25,3 +25,10 @@ export function queryForItems(query: DataItem[], typeFilter: string[]) {
     
     return serverFetch('/api/query?', params) as Promise<QueryServerResult>;
 }
+
+/**
+ * Get suggestions of items to autocomplete term.
+ */
+export function getSuggestForItems(searchTerm: string) {
+    return serverFetch('/api/suggest/' + searchTerm.trim());
+}

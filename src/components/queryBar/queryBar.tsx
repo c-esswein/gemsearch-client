@@ -6,6 +6,8 @@ import { QueryItem } from 'components/queryBar/queryItem';
 import { SearchInput } from 'components/queryBar/searchInput';
 import { DispatchContext } from 'components/dispatchContextProvider';
 import { SearchIcon } from 'icons';
+import { Suggestions } from 'components/queryBar/suggestions';
+import { getSuggestForItems } from 'api/query';
 
 require('./queryBar.scss');
 
@@ -14,7 +16,9 @@ export interface Props {
 }
 
 interface State {
-  itemAddId: string;
+  textInput: string,
+  suggestItems: DataItem[];
+  isFocused: boolean;
 }
 
 export class QueryBar extends React.Component<Props, State> {
@@ -23,72 +27,113 @@ export class QueryBar extends React.Component<Props, State> {
   };
   context: DispatchContext;
 
+  private elRef: HTMLDivElement;  
+
   constructor(props: Props) {
     super(props);
-    this.state = {itemAddId: ''};
+    this.state = {
+      suggestItems: [],
+      isFocused: false,
+      textInput: '',
+    };
 
-    this.handleAddIdChange = this.handleAddIdChange.bind(this);
-    this.handleItemAdd = this.handleItemAdd.bind(this);
     this.handleRemoveItem = this.handleRemoveItem.bind(this);
-    this.handleInputRemove = this.handleInputRemove.bind(this);
+    this.handleTextInputChange = this.handleTextInputChange.bind(this);
+    this.handleSuggestSelected = this.handleSuggestSelected.bind(this);
+    this.handleDocumentClick = this.handleDocumentClick.bind(this);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
-  private handleAddIdChange(event: React.FormEvent<HTMLInputElement>) {
-    this.setState({itemAddId: event.currentTarget.value});
+  public componentDidMount() {
+    document.addEventListener('click', this.handleDocumentClick);
   }
 
-  private handleItemAdd(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    this.queryItemInfo(this.state.itemAddId).
-      then(item => item && this.context.dispatch(queryActions.addQueryItem(item)));
-    this.setState({itemAddId: ''});
+  public componentWillUnmount() {
+    document.removeEventListener('click', this.handleDocumentClick);
   }
 
-  private queryItemInfo(id: string) {
-    return fetch('/api/object/' + id.trim())
-      .then(response => response.json())
-      .then(processServerResp)
-      .then((result: {data: DataItem[]}) => {
-        if (result.data.length > 0) {
-          return result[0];
-        }
-        alert('No Item found.');
-        return null;
-      });
+  private handleDocumentClick(e: MouseEvent) {
+    const target = e.target as HTMLElement;
+
+    console.log('here');
+
+    if (!this.elRef || !this.state.isFocused) {
+      return;
+    }
+
+    if(this.elRef === target || this.elRef.contains(target)) {
+      return;
+    }
+    this.setState({
+      isFocused: false,
+    });
   }
+
 
   private handleRemoveItem(item: DataItem) {
     this.context.dispatch(queryActions.removeQueryItem(item));
   }
 
-  private handleInputRemove() {
-    if (this.props.queryItems.length > 0) {
-      const lastItem = this.props.queryItems[this.props.queryItems.length - 1];
-      this.context.dispatch(queryActions.removeQueryItem(lastItem));
-    }
+  private handleSuggestSelected(item: DataItem) {
+    this.context.dispatch(queryActions.addQueryItem(item));
+    
+    this.setState({
+      isFocused: false,
+      textInput: '',      
+    });
   }
 
+  private handleTextInputChange(event: React.FormEvent<HTMLInputElement>) {
+    const textInput = event.currentTarget.value;
+    this.setState({
+      isFocused: true,      
+      textInput
+    });
+
+    getSuggestForItems(textInput).then(response => {
+      this.setState({
+        suggestItems: response.data
+      });
+    });
+  }
+
+  
+  private handleKeyDown(e: KeyboardEvent) {
+    if(e.key === 'Backspace' || e.key === 'Delete') {
+      if (this.state.textInput === '') {
+        // remove last query item on empty input delete
+        if (this.props.queryItems.length > 0) {
+          const lastItem = this.props.queryItems[this.props.queryItems.length - 1];
+          this.context.dispatch(queryActions.removeQueryItem(lastItem));
+        }
+      }
+    }
+  }
+  
   render() {
+    const {isFocused, suggestItems, textInput} = this.state;
+
     const renderQueryItem = (item: DataItem) => {
       return (
-        <QueryItem key={item.id} item={item} actionText="remove from query" onActionClick={this.handleRemoveItem} />
+        <QueryItem key={item.id} item={item} actionText="remove from query" mode="remove" onActionClick={this.handleRemoveItem} />
       );
     };
 
     return (
-      <div className="queryBar app-wrap">
-        {/*<form onSubmit={this.handleItemAdd}> 
-          <input type="text" value={this.state.itemAddId} onChange={this.handleAddIdChange} placeholder="Object ID" /> 
-        </form>
-        */}
+      <div className="queryBar" ref={ref => this.elRef = ref}>
         <div className="queryBar__control">
+          <SearchIcon className="svg-inline svg-fill-current queryBar__icon" />
           <div className="queryBar__q-items">
             {this.props.queryItems.map(renderQueryItem)}
           </div>
-          <SearchInput onRemoveLatestSelection={this.handleInputRemove} />
-          <SearchIcon className="svg-inline svg-fill-current queryBar__icon" />
+          <input type="text" className="queryBar__input" 
+            onChange={this.handleTextInputChange} onKeyDown={this.handleKeyDown as any}
+            value={textInput} placeholder="Search..." />
         </div>
+        {isFocused && textInput ? 
+          <Suggestions items={suggestItems} onSuggestionSelected={this.handleSuggestSelected} />          
+          : null
+        }
       </div>
     );
   }

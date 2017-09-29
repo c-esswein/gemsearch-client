@@ -2,45 +2,92 @@
 @import "constants.scss";
 
 .queryBar {
-    padding: 10px 0;
+    position: fixed;
+    transform: translate3d(0,0,0);
+    top: 0;
+    left: 0;
+    background: #fff6ef;
+    width: 100%;
+    z-index: 1;
+    box-shadow: 0 -3px 17px rgba(0,0,0,0.2);
 }
 
 .queryBar__control {
     display: flex;
     align-items: center;
-    border: 2px solid $colorCard;
-    padding: 10px;
+    padding: .7em;
 }
+
+.svg-inline.queryBar__icon {
+    height: 2em;
+    width: 2em;
+    fill: $colorBlack;
+    margin-right: 1em;
+    opacity: .8;
+}
+
 
 .queryBar__q-items {
     display: flex;
-
-    .item {
-        background: rgba(0, 188, 212, 0.21);
-        margin-right: 10px;
-    }
 }
 
-.queryBar__q-remove {
-    color: blue;
-    cursor: pointer;
-    float: right;
-}
-
+/** ------------ queryBar__item ------------ */
 .queryBar__item {
     position: relative;
-    padding-right: 35px;
-    padding-left: 20px;
-    margin-top: 0;
+    padding: 0 1em;
+    display: flex;
+    align-items: center;    
 
-    .item__query-link {
-        position: absolute;
-        right: 5px;
-        top: 5px;
+    &-type {
+        text-transform: uppercase;
+        font-size: .7em;
+    }
+
+    &:hover {
+        .queryBar__item-remove {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+        }
     }
 }
-.svg-inline.queryBar__icon {
-    height: 3em;
-    width: 3em;
-    fill: $colorLightFont;
+.queryBar__item-image {
+    width: 1.3em;
+    height: 1.3em;
+    margin-right: 0.3em;
+
+    &--tag {
+        text-align: center;
+        background: $colorTag;
+        font-size: 2em;
+        color: #fff;
+        opacity: .7;
+    }
+}
+
+.queryBar__item-remove {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    opacity: 0;
+    cursor: pointer;
+    transform: translate3d(0, -20%, 0);
+    transition: all .4s;
+
+    &:hover {
+        color: $colorActive;
+    }
+}
+
+/** ------------ queryBar__input ------------ */
+
+.queryBar__input {
+    color: $colorBlack;
+    background: none;
+    font-family: inherit;
+    font-size: 2.5em;
+    border: none;
+    width: 100%;
+    box-sizing: border-box;
+    height: auto;
+    padding: 0 .2em;
 }

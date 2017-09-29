@@ -6,3 +6,4 @@ export * from 'icons/remove';
 export * from 'icons/add';
 export * from 'icons/play';
 export * from 'icons/pause';
+export * from 'icons/options';

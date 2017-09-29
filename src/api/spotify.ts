@@ -62,6 +62,10 @@ export function getUserInfo(): Promise<SpotifyUser> {
             throw new Error('no spotify result object');
         }
         if (result.error) {
+            if (result.error.status === 401) {
+                // token is not valid or has expired
+                logout();
+            }
             throw new Error('spotify error: ' + JSON.stringify(result.error));
         }
 

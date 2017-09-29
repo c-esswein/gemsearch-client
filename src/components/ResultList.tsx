@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { ResultItem } from 'components/resultItem';
 import { DataItem } from 'types';
-import * as queryActions from 'actions/query';
-import { DispatchContext } from 'components/dispatchContextProvider';
+import { CSSTransitionGroup } from 'react-transition-group' ;
 
 require('./resultList.scss');
 
@@ -12,33 +11,27 @@ export interface Props {
 
 export class ResultList extends React.Component<Props, null> {
 
-  static contextTypes = {
-    dispatch: React.PropTypes.func.isRequired,
-  };
-  context: DispatchContext;
-
   constructor(props: Props) {
     super(props);
 
-    this.handleItemActionClick = this.handleItemActionClick.bind(this);
   }
 
   render() {
 
     const renderItem = (item: DataItem) => {
       return (
-        <ResultItem key={item.id} item={item} actionText="Use for query" onActionClick={this.handleItemActionClick} />
+        <ResultItem key={item.id} item={item} />
       );
     };
 
+    // https://github.com/reactjs/react-transition-group/tree/v1-stable
     return (
-      <div className="resultList app-wrap">
+      <CSSTransitionGroup component="div" className="resultList"
+        transitionName="resultList__anim"
+        transitionEnterTimeout={300}
+        transitionLeaveTimeout={300}>
         {this.props.items.map(renderItem)}
-      </div>
+      </CSSTransitionGroup>
     );
-  }
-  
-  private handleItemActionClick(item: DataItem) {
-    this.context.dispatch(queryActions.addQueryItem(item));
   }
 }

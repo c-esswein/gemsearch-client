@@ -1,32 +1,74 @@
 import * as React from 'react';
-import { DataItem } from 'types';
+import { DataItem, Track } from 'types';
 import { Item } from 'components/item';
-import { RemoveIcon } from 'icons';
+import { RemoveIcon, PlayIcon } from 'icons';
 
-export class QueryItem extends Item {
+
+export interface Props {
+  item: DataItem;
+  onActionClick: (item: DataItem) => void;
+  actionText?: string;
+  mode: 'remove' | 'item_select';
+}
+
+export class QueryItem extends React.Component<Props, {}> {
 
   constructor(props) {
       super(props);
 
-      this.handleFilterClick_ = this.handleFilterClick_.bind(this);
+      this.handleRemoveClick = this.handleRemoveClick.bind(this);
+      this.handleItemClick = this.handleItemClick.bind(this);
   }
 
-  handleFilterClick_(e: React.MouseEvent<HTMLElement>) {
+  private handleRemoveClick(e: React.MouseEvent<HTMLElement>) {
     this.props.onActionClick(this.props.item);
+  }
+
+  private handleItemClick(e: React.MouseEvent<HTMLElement>) {
+    if (this.props.mode === 'item_select') {
+      this.props.onActionClick(this.props.item);
+    }
+  }
+
+  renderImage() {
+    const item = this.props.item;
+
+    if (item.meta && item.meta.images && item.meta.images.length > 0) {
+      const imageVersion = item.meta.images.find(image => image.width === 300) || item.meta.images[0];
+
+      return (
+        <div className="queryBar__item-image" style={{backgroundImage: `url(${imageVersion.url})`}}></div>
+      );
+    }
+
+    if (item.type === 'tag') {
+      return (
+        <div className="queryBar__item-image queryBar__item-image--tag">#</div>
+      );
+    }
+
+    return (
+      <div className="queryBar__item-image queryBar__item-image--empty"></div>
+    );
   }
 
   render() {
     const item = this.props.item;
 
     return (
-      <div className="item queryBar__item" key={item.id}>
-        {/*{item.type !== 'tag' ? this.renderImage() : null}*/}
-        <div className="item__inner">
-          <div className="item__type">{item.type}</div>
-          {this.renderTitle()}
-          <span className="item__query-link" onClick={this.handleFilterClick_}>
-            <RemoveIcon className="svg-inline svg-fill-current" />
-          </span>
+      <div className="queryBar__item" key={item.id} onClick={this.handleItemClick}>
+        {this.renderImage()}
+        <div className="queryBar__item-inner">
+          <div className="queryBar__item-type">{item.type}</div>
+          <span className="queryBar__item-name">{item.name}</span>
+
+          {(this.props.mode === 'remove') ? 
+            <span className="queryBar__item-remove" onClick={this.handleRemoveClick} title={this.props.actionText}>
+              <RemoveIcon className="svg-inline svg-fill-current" />
+            </span>
+            : null
+          }
+
         </div>
       </div>
     );

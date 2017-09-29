@@ -1,0 +1,53 @@
+
+@import "constants.scss";
+
+.queryBar__suggestions {
+    position: absolute;
+    top: 100%;
+    margin-top: .8em;
+    left: 4em;
+    background: #fff;
+    width: 800px;
+    padding: 1em;
+    display: flex;
+
+}
+
+
+.queryBar__suggestions-filters {
+    text-transform: uppercase;
+    cursor: pointer;
+    border-right: 1px solid rgba(0, 0, 0, .6);
+}
+
+.queryBar__suggestions-filter {
+    margin: .6em 0;
+    padding-right: 2em;
+    font-size: 0.9em;
+
+    &:hover {
+        color: $colorActive;
+    }
+}
+.queryBar__suggestions-filter--active {
+    color: $colorActive;
+}
+
+/* ----------- suggestions ----------- */
+
+.queryBar__suggestions-items {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: -1.5em;    
+    
+    .queryBar__item {
+        cursor: pointer;
+        width: 50%;
+        box-sizing: border-box;
+        margin-bottom: 1.5em;
+
+        &:hover {
+            color: $colorActive;    
+        }
+    }
+}
