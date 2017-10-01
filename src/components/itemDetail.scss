@@ -31,6 +31,10 @@
     color: #000;
     display: flex;
 
+    @media only screen and (max-width: 600px) {
+        display: block;
+    }
+
     .item__image {
         max-width: 100%;
     }
@@ -41,25 +45,12 @@
     margin-right: 1em;
 }
 
-
-.itemDetail__image {
-    position: relative;
-    background-color: rgba(0, 0, 0, .4);
-    background-size: cover;
-    box-shadow: 0 8px 28px 0 rgba(28, 24, 37, 0.55);
-    display: block;
-
-    // fix ratio
-    &:before {
-        display: block;
-        content: '';
-        padding-bottom: 100%;
-        transition: all .3s;        
-    }
-}
-
 .itemDetail__main {
     flex: 1;
+
+    @media only screen and (max-width: 600px) {
+        margin-top: 2em;
+    }
 }
 
 .itemDetail__type {

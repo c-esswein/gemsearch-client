@@ -35,6 +35,7 @@ export interface DataItem {
     /** position of item in 3D, coordinates are relative to queryVec */
     position: number[];
     meta?: {
+        artist?: string,
         uri?: string,
         images?: ImageData[]
     }

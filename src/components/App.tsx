@@ -67,6 +67,9 @@ export class App extends React.Component<Props, null> {
     }
   }
 
+  /**
+   * Query api for items.
+   */
   private queryForItems(query: DataItem[], typeFilter: string[]) {
     queryForItems(query, typeFilter)
       .then(data => this.context.dispatch(queryActions.receiveItems(data)));
@@ -87,13 +90,10 @@ export class App extends React.Component<Props, null> {
     const hasQueryItems = (props.queryItems.length > 0);
 
     const renderViewLink = (title: string, state: ViewModus) => {
-      /* if (!hasQueryItems) {
-        return null;
-      } */
-
       return (
         <span 
           className={'app__view-link ' + (props.viewModus === state ? 'app__view-link--active' : '')}
+          title={'Show results as ' + title}
           onClick={this.handleViewChangeClick.bind(this, state)}>
           {state === ViewModus.GRAPH ? 
               <GraphIcon /> :
@@ -107,7 +107,9 @@ export class App extends React.Component<Props, null> {
     const renderTypeFilter = (filterName: string) => {
       const isActive = props.typeFilter.indexOf(filterName) > -1;
       return (
-        <div className={'app__type-filter ' + (isActive ? 'app__type-filter--active' : '')} onClick={() => this.handleTypeFilterClick(filterName)}>
+        <div className={'app__type-filter ' + (isActive ? 'app__type-filter--active' : '')} 
+          title={'Filter for ' + filterName}
+          onClick={() => this.handleTypeFilterClick(filterName)}>
           {filterName}
         </div>
       );
@@ -137,16 +139,19 @@ export class App extends React.Component<Props, null> {
       <div className="app">
         <QueryBar queryItems={props.queryItems} />
         
-        <div className="app__filter">
-          <div className="app__type-filters">
-            {filterItemTypes.map(renderTypeFilter)}
-          </div>
+        {hasQueryItems ? 
+          <div className="app__filter">
+            <div className="app__type-filters">
+              {filterItemTypes.map(renderTypeFilter)}
+            </div>
 
-          <div className="app__view-links">
-            {renderViewLink('Liste', ViewModus.LIST)}
-            {renderViewLink('Graph', ViewModus.GRAPH)}
+            <div className="app__view-links">
+              {renderViewLink('List', ViewModus.LIST)}
+              {renderViewLink('Graph', ViewModus.GRAPH)}
+            </div>
           </div>
-        </div>
+          : null 
+        }
 
         {renderMainView()}
 

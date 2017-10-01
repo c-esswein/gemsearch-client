@@ -31,7 +31,6 @@ export class ResultItem extends React.Component<Props, {}> {
   }
 
   private handlePlayClick() {
-    console.log('player click');
     const item = this.props.item;
 
     this.context.dispatch(
@@ -112,6 +111,10 @@ export class ResultItem extends React.Component<Props, {}> {
         {this.renderImage()}
         <div className="resultItem__inner">
           {this.renderTitle()}
+
+          {item.meta && item.meta.artist ?
+            <span className="resultItem__artist">{item.meta.artist}</span>            
+          : null}
         </div>
       </div>
     );

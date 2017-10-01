@@ -59,7 +59,7 @@ export class QueryItem extends React.Component<Props, {}> {
         {this.renderImage()}
         <div className="queryBar__item-inner">
           <div className="queryBar__item-type">{item.type}</div>
-          <span className="queryBar__item-name">{item.name}</span>
+          <span className="queryBar__item-name" title={item.name}>{item.name}</span>
 
           {(this.props.mode === 'remove') ? 
             <span className="queryBar__item-remove" onClick={this.handleRemoveClick} title={this.props.actionText}>

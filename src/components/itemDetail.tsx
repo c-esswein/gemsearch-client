@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { DataItem, Track } from 'types';
-import { PlayIcon } from 'icons';
+import { PlayIcon, AddIcon } from 'icons';
 import { DispatchContext } from 'components/dispatchContextProvider';
 import * as playerActions from 'actions/player';
 import * as viewActions from 'actions/views';
+import * as queryActions from 'actions/query';
 import { xFetch } from 'utils';
 
 
@@ -35,6 +36,7 @@ export class ItemDetail extends React.Component<Props, State> {
       };
 
       this.handlePlayClick = this.handlePlayClick.bind(this);
+      this.handleFilterClick_ = this.handleFilterClick_.bind(this);
       this.handleRequestClose = this.handleRequestClose.bind(this);
   }
 
@@ -59,34 +61,57 @@ export class ItemDetail extends React.Component<Props, State> {
     );
   }
 
+  private handleFilterClick_(e: React.MouseEvent<HTMLElement>) {
+    this.context.dispatch(queryActions.addQueryItem(this.props.item));
+  }
+
   private handleRequestClose() {
       this.context.dispatch(
           viewActions.closeItemDetail()
       );
+      
+      this.state = {
+        neighbors: []
+      };
   }
 
-  renderImage() {
+  private renderImage() {
     const item = this.props.item;
 
     if (item.meta && item.meta.images && item.meta.images.length > 0) {
       const imageVersion = item.meta.images.find(image => image.width === 300) || item.meta.images[0];
 
-      if (item.type === 'track' && item.meta.uri) {
-        return (
-          <div className="itemDetail__image item__link" style={{backgroundImage: `url(${imageVersion.url})`}} onClick={this.handlePlayClick}>
-            {/*<div className="item__play" onClick={this.handlePlayClick}>*/}
-              <PlayIcon className="item__play-icon" />
-            {/*</div>*/}
-          </div>
-        );
-      }
       return (
-        <div className="itemDetail__image" style={{backgroundImage: `url(${imageVersion.url})`}}></div>
+        <div className="resultItem__img" style={{backgroundImage: `url(${imageVersion.url})`}}>
+            <div className="resultItem__hover">
+              <div className="resultItem__query-add" title="Add to search" onClick={this.handleFilterClick_}>
+                <AddIcon className="svg-inline svg-fill-current resultItem__query-add-ico" />                
+              </div>
+
+              {item.type === 'track' ? 
+                <PlayIcon className="resultItem__play-icon" onClick={this.handlePlayClick} />
+                : null
+              }
+            </div>
+        </div>
+      );
+    }
+  
+    if (item.type === 'tag') {
+      return (
+        <div className="resultItem__img resultItem__img--tag">
+          <span>#</span>
+          <div className="resultItem__hover">
+            <div className="resultItem__query-add" title="Add to search" onClick={this.handleFilterClick_}>
+              <AddIcon className="svg-inline svg-fill-current resultItem__query-add-ico" />                
+            </div>
+          </div>
+        </div>      
       );
     }
 
     return (
-      <div className="itemDetail__image itemDetail__image--empty"></div>
+      <div className="resultItem__img resultItem__img--empty"></div>
     );
   }
   
@@ -138,22 +163,21 @@ export class ItemDetail extends React.Component<Props, State> {
     }
 
     return (
-        <div className="itemDetail__container">
-            <div className="itemDetail__overlay" onClick={this.handleRequestClose}></div>
-            
-            <div className="itemDetail">
-                <div className="itemDetail__left">
-                  {item.type !== 'tag' ? this.renderImage() : null}
-                </div>
-                <div className="itemDetail__main">
-                  <div className="itemDetail__type">{item.type}</div>
-                  {this.renderTitle()}
-                  <div className="itemDetail__neighbors">
-                    {this.renderNeighbors()}
-                  </div>
-                </div>
+      <div className="itemDetail__container"> 
+        <div className="itemDetail__overlay" onClick={this.handleRequestClose}></div>   
+        <div className="itemDetail">
+          <div className="itemDetail__left">
+            {item.type !== 'tag' ? this.renderImage() : null}
+          </div>
+          <div className="itemDetail__main">
+            <div className="itemDetail__type">{item.type}</div>
+            {this.renderTitle()}
+            <div className="itemDetail__neighbors">
+              {this.renderNeighbors()}
             </div>
+          </div>
         </div>
+      </div>
     );
   }
 }

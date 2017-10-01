@@ -30,7 +30,7 @@
         width: calc(100%/7 - 2%);
     }
     
-    &:hover {
+    &:hover, &__img:hover {
         .resultItem__hover {
             opacity: 1;
         }
@@ -148,4 +148,9 @@
     font-weight: bold;
     margin-top: .8em;
     display: block;
+}
+
+.resultItem__artist {
+    opacity: 0.7;
+    font-size: 0.9em;
 }

@@ -43,7 +43,8 @@ export class GraphItem {
 
       // ---- create image element ----
       // find smallest image
-      const imageVersion = model.meta.images.length > 0 ? 
+      // TODO: tags do not have images...
+      const imageVersion = model.meta && model.meta.images.length > 0 ? 
         (model.meta.images.find(image => image.width === 160) || model.meta.images[0])
         : {url: ''};
 
