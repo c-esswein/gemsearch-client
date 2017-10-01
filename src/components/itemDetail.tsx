@@ -73,7 +73,7 @@ export class ItemDetail extends React.Component<Props, State> {
 
       if (item.type === 'track' && item.meta.uri) {
         return (
-          <div className="item__image item__link" style={{backgroundImage: `url(${imageVersion.url})`}} onClick={this.handlePlayClick}>
+          <div className="itemDetail__image item__link" style={{backgroundImage: `url(${imageVersion.url})`}} onClick={this.handlePlayClick}>
             {/*<div className="item__play" onClick={this.handlePlayClick}>*/}
               <PlayIcon className="item__play-icon" />
             {/*</div>*/}
@@ -81,12 +81,12 @@ export class ItemDetail extends React.Component<Props, State> {
         );
       }
       return (
-        <div className="item__image" style={{backgroundImage: `url(${imageVersion.url})`}}></div>
+        <div className="itemDetail__image" style={{backgroundImage: `url(${imageVersion.url})`}}></div>
       );
     }
 
     return (
-      <div className="item__image item__image--empty"></div>
+      <div className="itemDetail__image itemDetail__image--empty"></div>
     );
   }
   
@@ -143,10 +143,10 @@ export class ItemDetail extends React.Component<Props, State> {
             
             <div className="itemDetail">
                 <div className="itemDetail__left">
-                  <div className="itemDetail__type">{item.type}</div>
                   {item.type !== 'tag' ? this.renderImage() : null}
                 </div>
                 <div className="itemDetail__main">
+                  <div className="itemDetail__type">{item.type}</div>
                   {this.renderTitle()}
                   <div className="itemDetail__neighbors">
                     {this.renderNeighbors()}

@@ -28,7 +28,7 @@ export class ResultList extends React.Component<Props, null> {
     return (
       <CSSTransitionGroup component="div" className="resultList"
         transitionName="resultList__anim"
-        transitionEnterTimeout={300}
+        transitionEnterTimeout={800}
         transitionLeaveTimeout={300}>
         {this.props.items.map(renderItem)}
       </CSSTransitionGroup>

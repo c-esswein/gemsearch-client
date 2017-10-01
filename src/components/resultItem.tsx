@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { DataItem, Track } from 'types';
-import { Item } from 'components/item';
 import { AddIcon } from 'icons';
 import { RemoveIcon, PlayIcon, OptionsIcon } from 'icons';
 import * as playerActions from 'actions/player';
@@ -71,6 +70,19 @@ export class ResultItem extends React.Component<Props, {}> {
       );
     }
 
+    if (item.type === 'tag') {
+      return (
+        <div className="resultItem__img resultItem__img--tag">
+          <span>#</span>
+          <div className="resultItem__hover">
+            <div className="resultItem__query-add" title="Add to search" onClick={this.handleFilterClick_}>
+              <AddIcon className="svg-inline svg-fill-current resultItem__query-add-ico" />                
+            </div>
+          </div>
+        </div>      
+      );
+    }
+
     return (
       <div className="resultItem__img resultItem__img--empty"></div>
     );
@@ -97,7 +109,7 @@ export class ResultItem extends React.Component<Props, {}> {
 
     return (
       <div className={'resultItem resultItem--' + item.type} key={item.id}>      
-        {item.type !== 'tag' ? this.renderImage() : null}
+        {this.renderImage()}
         <div className="resultItem__inner">
           {this.renderTitle()}
         </div>

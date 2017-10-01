@@ -2,32 +2,51 @@
 @import "constants.scss";
 
 .app {
-  margin: 150px 0 180px 0;
+  margin: 6em 0 180px 0;
   padding: 0 20px;
 }
 
 .app__filter {
   display: flex;
-  margin-bottom: 30px;
-  padding-top: 0;
+  margin-bottom: 2em;
+  padding: 1em;
+  padding-bottom: 0;
+  align-items: center;
 }
+
+.app__type-filters {
+  display: flex;
+}
+  .app__type-filter {
+    border-bottom: 3px solid transparent;
+    margin-right: 1.5em;
+    padding-bottom: 0.3em;
+    text-transform: capitalize;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: all 0.3s;
+    opacity: 0.5;
+    
+    &--active, &:hover {
+      border-bottom: 3px solid $colorActive;
+      opacity: 1;
+    }
+  }
 
 .app__view-links {
-  padding: 10px 0;
   margin-left: auto;
 }
-
-.app__view-link {
-  cursor: pointer;
-  padding: .4em .8em;
-  border-radius: 1px;
-  text-transform: uppercase;
-  color: $colorCard;
-  margin: .2em;
-  font-weight: 600;
-
-  &--active, &:hover {
-    color: #fff;
-    background: $colorCard;
+  .app__view-link {
+    cursor: pointer;
+    padding: .4em .8em;
+    border-radius: 1px;
+    text-transform: uppercase;
+    opacity: 0.5;
+    margin: 0.2em;
+    transition: opacity 0.2s;
+    // font-weight: 600;
+    
+    &--active, &:hover {
+      opacity: 1;
+    }
   }
-}

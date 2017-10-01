@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { DataItem, Track } from 'types';
-import { Item } from 'components/item';
 import { RemoveIcon, PlayIcon } from 'icons';
 
 

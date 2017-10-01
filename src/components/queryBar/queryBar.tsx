@@ -55,8 +55,6 @@ export class QueryBar extends React.Component<Props, State> {
   private handleDocumentClick(e: MouseEvent) {
     const target = e.target as HTMLElement;
 
-    console.log('here');
-
     if (!this.elRef || !this.state.isFocused) {
       return;
     }

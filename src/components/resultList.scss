@@ -43,17 +43,20 @@
 
 // appear / leave animations
 .resultList__anim {
+    &-enter-active {
+        transition: opacity 0.8s, transform 0.6s;
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
     &-enter {
         opacity: 0;
-    }
-    &-enter-active {
-        transition: opacity .3s;
-        opacity: 1;
+        transform: translate3d(0, 5%, 0);
     }
 
     &-leave-active {
-        transition: opacity .3s;
+        transition: opacity 0.3s ease-out, transform 0.3s ease-out;
         opacity: 0;
+        transform: scale(1.1);
     }
 }
 
@@ -61,7 +64,7 @@
     width: 100%;
     max-width: 100%;
     position: relative;
-    background-color: gray;
+    background-color: rgba(0, 0, 0, .4);
     background-size: cover;
     box-shadow: 0 8px 28px 0 rgba(28, 24, 37, 0.55);
     display: block;
@@ -72,6 +75,20 @@
         content: '';
         padding-bottom: 100%;
         transition: all .3s;        
+    }
+
+    &--tag {
+        background-color: $colorTag !important;
+        color: #fff;
+        opacity: .7;
+
+        span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate3d(-50%, -50%, 0);    
+            font-size: 3em;
+        }
     }
 }
 
@@ -132,24 +149,3 @@
     margin-top: .8em;
     display: block;
 }
-
-/* 
-.item__query-link {
-    font-size: 70%;
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    cursor: pointer;
-    transition: transform .3s;
- 
-    &:hover {
-        // color: #000;
-        transform: scale(1.2);
-    }
-
-    &-icon.svg-inline {
-        width: 1.5em;
-        height: 1.5em;
-    }
-}
- */
