@@ -1,0 +1,56 @@
+@import "constants.scss";
+
+// login button
+.authControl--login {
+    cursor: pointer;    
+}
+.authControl__logo {
+    width: 3em;
+    height: 3em;
+    fill: #b5d4c0;
+    transition: fill 0.3s;
+    
+    .authControl:hover &, .authControl--connect-open & {
+        fill: #1ED760;
+    }
+}
+
+// logged in user
+.authControl--user {
+    display: flex;
+}
+.authControl__userimg {
+    width: 3em;
+    height: 3em;
+    border-radius: 50%;
+    background-size: cover;
+    cursor: pointer;
+    transition: opacity .3;
+
+    &:hover {
+        opacity: .6;
+    }
+}
+
+.authControl__info {
+    white-space: nowrap;
+    align-self: flex-end;
+    margin-right: 1em;
+    font-size: 0.6em;
+    text-align: right;
+
+    a {
+        display: inline-block;
+        margin: 0 0.1em;
+        cursor: pointer;
+        
+        &:hover {
+            color: $colorActive;
+        }
+    }
+}
+
+.authControl__name {
+    font-size: 0.8rem;
+    margin-bottom: 0.1em;
+}

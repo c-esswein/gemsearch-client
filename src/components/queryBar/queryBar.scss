@@ -10,6 +10,10 @@
     width: 100%;
     z-index: 1;
     box-shadow: 0 -3px 17px rgba(0,0,0,0.2);
+
+    &.queryBar--modal-open {
+        pointer-events: none;
+    }
 }
 
 .queryBar__control {
@@ -29,6 +33,11 @@
 
 .queryBar__q-items {
     display: flex;
+}
+
+.queryBar__suggestions-noitems {
+    margin-left: 1em;
+    font-size: .9em;
 }
 
 /** ------------ queryBar__item ------------ */

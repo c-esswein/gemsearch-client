@@ -12,8 +12,9 @@ import { AppContainer as ReactHotLoaderAppContainer } from 'react-hot-loader';
 
 require('styles/index.scss');
 require('styles/svg.scss');
-require('styles/react-autosuggest.scss'); // TODO scss import is not working
-require('styles/react-select.scss');
+/* require('styles/react-autosuggest.scss'); // TODO scss import is not working
+require('styles/react-select.scss'); */
+require('styles/buttons.scss');
 
 function configureStore(initialState: StoreState) {
   const devToolsExtension: StoreEnhancer<any> = typeof window === 'object' && typeof window.devToolsExtension !== 'undefined' ? window.devToolsExtension() : f => f;

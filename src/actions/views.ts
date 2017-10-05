@@ -1,7 +1,7 @@
 import { ViewModus, DataItem } from '../types';
 
 export type Actions = ChangeMainViewTypeAction 
-    | OpenItemDetailAction | CloseItemDetailAction;
+    | OpenItemDetailAction | CloseItemDetailAction | SetConnectDialogOpenStateAction;
 
 export interface ChangeMainViewTypeAction {
     type: 'MAIN_VIEW_TYPE_CHANGE';
@@ -31,5 +31,16 @@ export interface CloseItemDetailAction {
 export function closeItemDetail(): CloseItemDetailAction {
     return {
         type: 'CLOSE_ITEM_DETAIL',
+    };
+}
+
+export interface SetConnectDialogOpenStateAction {
+    type: 'SET_CONNECT_DIALOG_OPEN_STATE';
+    isOpen: boolean;
+}
+export function setConnectDialogOpenState(isOpen: boolean): SetConnectDialogOpenStateAction {
+    return {
+        type: 'SET_CONNECT_DIALOG_OPEN_STATE',
+        isOpen
     };
 }

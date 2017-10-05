@@ -21,6 +21,7 @@ import { setCurrentUser } from 'actions/user';
 import { connect } from 'react-redux';
 import { StoreState, ViewModus } from 'types';
 import { filterItemTypes } from 'constants/itemTypes';
+import { ConnectedConnectDialog } from 'components/connectDialog';
 
 
 export interface Props {
@@ -157,7 +158,9 @@ export class App extends React.Component<Props, null> {
 
         <ConnectedPlayerBar />
 
+        {/* --- Modals --- */}
         <ConnectedItemDetail />
+        <ConnectedConnectDialog />
       </div>
     );
   }
@@ -170,12 +173,12 @@ export interface ConnectedProps extends Props {
 }
 
 export const ConnectedApp = connect(
-  ({ query, views }: StoreState, ownProps: ConnectedProps) => ({
+  ({ query, views, user }: StoreState, ownProps: ConnectedProps) => ({
     resultItems: query.resultItems,
     result: query.result,
     queryItems: query.queryItems,
     typeFilter: query.typeFilter,
-    viewModus: views.app.viewModus
+    viewModus: views.app.viewModus,
   }),
 )(App as any);
 

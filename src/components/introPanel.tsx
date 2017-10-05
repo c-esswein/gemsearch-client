@@ -31,7 +31,7 @@ export class IntroPanel extends React.Component<Props, null> {
           <div className="introPanel__item">
             <div className="introPanel__item-text right">
               <h2 className="introPanel__item-hd">Explorer</h2>
-              <p>Find new items...</p>
+              <p>Explorer the search results, find new songs and refine your search.</p>
             </div>
           </div>
 

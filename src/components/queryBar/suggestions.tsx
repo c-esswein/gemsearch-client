@@ -71,6 +71,11 @@ export class Suggestions extends React.Component<Props, State> {
             {filterItemTypes.map(filter => renderFilter(filter, filter === activeTypeFilter))}
         </div>
         <div className="queryBar__suggestions-items">
+            {filteredItems.length === 0 ? 
+                <div className="queryBar__suggestions-noitems">
+                    no results found
+                </div>
+            : null}
             {filteredItems.map(item => (
                 <QueryItem key={item.id} item={item} mode="item_select" onActionClick={this.handleItemClick} />                
             ))}

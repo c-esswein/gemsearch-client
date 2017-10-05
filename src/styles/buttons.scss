@@ -1,0 +1,15 @@
+@import "constants.scss";
+
+.btn-raised {
+    display: inline-flex;
+    padding: .8em;
+    align-items: center;
+    cursor: pointer;
+    background: $colorBg;
+    box-shadow: 0 2px 7px rgba(0,0,0,0.1);    
+    transition: all 0.2s;
+
+    &:hover {
+        transform: scale(1.05);
+    }
+}

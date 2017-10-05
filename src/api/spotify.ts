@@ -1,4 +1,5 @@
 import { CONFIG } from 'config';
+import { ImageData } from 'types';
 
 const stateKey = 'spotify_auth_state';
 

@@ -3,11 +3,12 @@ import { DataItem } from 'types';
 import * as queryActions from 'actions/query';
 import { processServerResp } from 'api';
 import { QueryItem } from 'components/queryBar/queryItem';
-import { SearchInput } from 'components/queryBar/searchInput';
 import { DispatchContext } from 'components/dispatchContextProvider';
 import { SearchIcon } from 'icons';
 import { Suggestions } from 'components/queryBar/suggestions';
 import { getSuggestForItems } from 'api/query';
+import { ConnectedAuthControl } from 'components/authControl';
+import { SpotifyUser } from 'api/spotify';
 
 require('./queryBar.scss');
 
@@ -88,6 +89,10 @@ export class QueryBar extends React.Component<Props, State> {
       textInput
     });
 
+    if (textInput.trim() === '') {
+      return;
+    }
+
     getSuggestForItems(textInput).then(response => {
       this.setState({
         suggestItems: response.data
@@ -127,6 +132,8 @@ export class QueryBar extends React.Component<Props, State> {
           <input type="text" className="queryBar__input" 
             onChange={this.handleTextInputChange} onKeyDown={this.handleKeyDown as any}
             value={textInput} placeholder="Search..." />
+
+          <ConnectedAuthControl />
         </div>
         {isFocused && textInput ? 
           <Suggestions items={suggestItems} onSuggestionSelected={this.handleSuggestSelected} />          

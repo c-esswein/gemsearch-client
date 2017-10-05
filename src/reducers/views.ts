@@ -8,7 +8,10 @@ export interface ViewState {
     itemDetail: {
       isOpen: boolean,
       item?: DataItem
-    }
+    },
+    connectDialog: {
+      isOpen: boolean,
+    },
 }
 
 const initialState: ViewState = {
@@ -17,6 +20,9 @@ const initialState: ViewState = {
   },
   itemDetail: {
     isOpen: false
+  },
+  connectDialog: {
+    isOpen: false,
   }
 };
 
@@ -45,6 +51,14 @@ export function viewReducer(state: ViewState = initialState, action: Actions): V
           itemDetail: {
             ...state.itemDetail,
             isOpen: false
+          }
+      };
+    case 'SET_CONNECT_DIALOG_OPEN_STATE':
+      return { 
+        ...state, 
+        connectDialog: {
+            ...state.connectDialog,
+            isOpen: action.isOpen
           }
       };
     default:

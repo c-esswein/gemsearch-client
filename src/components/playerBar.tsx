@@ -12,9 +12,11 @@ require('./playerBar.scss');
 export interface Props {
   currentTrack: Track,
   isPlaying: boolean,
-  user: SpotifyUser,
 }
 
+/**
+ * Bottom bar to play and control preview playing.
+ */
 export class PlayerBar extends React.Component<Props, null> {
 
   static contextTypes = {
@@ -77,13 +79,7 @@ export class PlayerBar extends React.Component<Props, null> {
     const track = this.props.currentTrack;
 
     if (!track) {
-      // TODO: remove bar again
-      // return null;
-      return (
-        <div className="playerBar">
-          <AuthControl user={this.props.user} />          
-        </div>
-      );      
+      return null;
     }
 
     const isPlayable = !!track.meta.preview_url;
@@ -106,7 +102,6 @@ export class PlayerBar extends React.Component<Props, null> {
             <div className="playerBar__meta-name">{track.name}</div>
           </div>
 
-          <AuthControl user={this.props.user} />                    
       </div>
     );
   }
@@ -116,7 +111,6 @@ export class PlayerBar extends React.Component<Props, null> {
 
 import { StoreState } from 'types';
 import { connect } from 'react-redux';
-import { SpotifyUser } from 'api/spotify';
 
 
 interface ConnectedProps {
@@ -127,7 +121,6 @@ export const ConnectedPlayerBar = connect(
   ({player, user}: StoreState, ownProps: ConnectedProps) => ({
     currentTrack: player.currentTrack,
     isPlaying: player.isPlaying,
-    user: user.currentUser,
   }),
 )(PlayerBar as any);
 // TODO: fix typings
