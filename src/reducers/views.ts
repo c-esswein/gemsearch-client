@@ -14,6 +14,8 @@ export interface ViewState {
     },
     graph: {
       activeCluster: string | null,
+      intersectionId: string | null,
+      intersectionPoint: THREE.Vector3 | null,
     }
 }
 
@@ -29,6 +31,8 @@ const initialState: ViewState = {
   },
   graph: {
     activeCluster: null,
+    intersectionId: null,
+    intersectionPoint: null,
   },
 };
 
@@ -73,6 +77,15 @@ export function viewReducer(state: ViewState = initialState, action: Actions): V
         graph: {
             ...state.graph,
             activeCluster: action.clusterId
+          }
+      };
+    case 'SET_GRAPH_INTERSECTION_ID':
+      return { 
+        ...state, 
+        graph: {
+            ...state.graph,
+            intersectionId: action.intersectionId,
+            intersectionPoint: action.intersectionPoint || state.graph.intersectionPoint,
           }
       };
     default:

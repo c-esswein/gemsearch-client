@@ -2,7 +2,7 @@ import { ViewModus, DataItem } from '../types';
 
 export type Actions = ChangeMainViewTypeAction 
     | OpenItemDetailAction | CloseItemDetailAction | SetConnectDialogOpenStateAction
-    | SetGraphClusterActiveAction;
+    | SetGraphClusterActiveAction | SetGraphIntersectionIdAction;
 
 export interface ChangeMainViewTypeAction {
     type: 'MAIN_VIEW_TYPE_CHANGE';
@@ -54,6 +54,19 @@ export function setGraphClusterActive(clusterId: string | null): SetGraphCluster
     return {
         type: 'SET_GRAPH_CLUSTER_ACTIVE',
         clusterId
+    };
+}
+
+export interface SetGraphIntersectionIdAction {
+    type: 'SET_GRAPH_INTERSECTION_ID';
+    intersectionId: string | null;
+    intersectionPoint: THREE.Vector3 | null;
+}
+export function setGraphIntersection(intersectionId: string | null, intersectionPoint: THREE.Vector3 | null = null): SetGraphIntersectionIdAction {
+    return {
+        type: 'SET_GRAPH_INTERSECTION_ID',
+        intersectionId,
+        intersectionPoint
     };
 }
 

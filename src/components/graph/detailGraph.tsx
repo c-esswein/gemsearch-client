@@ -10,7 +10,7 @@ import * as viewActions from 'actions/views';
 import { GraphItem } from 'components/graph/graphItem';
 import { QueryServerResult } from 'api/query';
 import { Cluster } from 'components/graph/cluster';
-import { setGraphClusterActive } from 'actions/views';
+import { setGraphClusterActive, setGraphIntersection } from 'actions/views';
 import { connect } from 'react-redux';
 import { RemoveIcon } from 'icons';
 
@@ -19,6 +19,8 @@ require('./graph.scss');
 export interface Props {
   result: QueryServerResult;
   activeClusterId: string | null;
+  intersectionId: string | null;
+  intersectionPoint: THREE.Vector3 | null;
 }
 
 const DEBUG = true;
@@ -33,7 +35,6 @@ export class DetailGraph extends ThreeScene<Props> {
   private activeCluster: Cluster;
   private raycaster: THREE.Raycaster;
   private intersectionMeshes: THREE.Object3D[];
-  private intersectionId: string; 
 
   /** Mouse position before cluster was expanded */
   private cameraPosBeforeCluster: THREE.Vector3;
@@ -138,15 +139,25 @@ export class DetailGraph extends ThreeScene<Props> {
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const intersects = this.raycaster.intersectObjects(intersectionMeshes);
 
+    let intersectionId = null;
     if (intersects.length > 0) {
       // save intersection and show pointer
       const intersectIndex = intersects[0].index;
-      this.intersectionId = intersects[0].object.name;
+      intersectionId = intersects[0].object.name;
       this.setPointerCursor(true);
     } else {
       // no intersection
-      this.intersectionId = null;
       this.setPointerCursor(false);
+    }
+
+    // new intersection
+    if (intersectionId !== this.props.intersectionId) {
+      if (intersectionId) {
+        const intersectionPoint = intersects[0].point.clone();
+        this.context.dispatch(setGraphIntersection(intersectionId, intersectionPoint));
+      } else {
+        this.context.dispatch(setGraphIntersection(intersectionId));
+      }
     }
 
   }
@@ -164,28 +175,38 @@ export class DetailGraph extends ThreeScene<Props> {
    * Handles click on canvas: if item is hovered, details are shown / cluster is expanded.
    */
   protected handleCanvasClick(event: React.MouseEvent<HTMLElement>) {
-    if (!this.intersectionId) {
+    const {intersectionId} = this.props;
+    if (!intersectionId) {
       return ;
     }
 
-    DEBUG && console.log('detailGraph: click on ', this.intersectionId);
+    DEBUG && console.log('detailGraph: click on ', intersectionId);
 
-    // click on cluster
-    if (this.intersectionId.startsWith('cluster_')) {
-      this.setClusterActive(this.clusters.get(this.intersectionId));
+    if (intersectionId.startsWith('cluster_')) {
+      // click on cluster
+      this.setClusterActive(this.clusters.get(intersectionId));
+    } else {
+      // resolve item by id
+      const item = this.getItemById(intersectionId);
+      this.context.dispatch(
+        viewActions.openItemDetail(item)
+      );
     }
 
+  }
+
+  /**
+   * Returns item info by id.
+   */
+  private getItemById(id: string) {
     let items = this.props.result.data;
+
     if (this.activeCluster !== null) {
       // in cluster mode
       items = this.activeCluster.items;
     }
 
-    // resolve item by id
-    const item = items.find(item => (item.id === this.intersectionId));
-    this.context.dispatch(
-      viewActions.openItemDetail(item)
-    );
+    return items.find(item => (item.id === id));    
   }
 
   /**
@@ -252,11 +273,48 @@ export class DetailGraph extends ThreeScene<Props> {
   /** @inheritDoc */
   protected renderChildElements() {
     const isClusterActive = !!this.props.activeClusterId;
+    const {intersectionId, intersectionPoint} = this.props;
+
+    const hoverStyles: React.CSSProperties = {};
+    if (intersectionPoint) {
+      const realWorld = this.getElementCoordinates(intersectionPoint);
+      hoverStyles.left = realWorld.x;
+      hoverStyles.top = realWorld.y;
+    }
+
+    let itemHover = null;
+    if (intersectionId && intersectionId.startsWith('cluster_')) {
+      const cluster = this.clusters.get(intersectionId);
+      itemHover = (
+        <div>Cluster with {cluster.items.length} items.</div>
+      );
+    } else if (intersectionId) {
+      const item = this.getItemById(intersectionId);
+      if (!item) {
+        console.error('Precondition violation: Intersection item not found');
+      }
+      itemHover = (
+        <div>
+          <div className="detailGraph__item-hover-name">{item.name}</div>
+          {item.meta && item.meta.artist ?
+            <div className="detailGraph__item-hover-artist">{item.meta.artist}</div>
+          : null}
+        </div>
+      );
+    }
 
     return (
-      <div className={'detailGraph__cluster-close ' + (isClusterActive ? 'active' : '')}
-       onClick={() => this.deactivateCluster()} title="close cluster">
-        <RemoveIcon className="svg-fill-current" />
+      <div>
+        {/* Cluster close btn */}
+        <div className={'detailGraph__cluster-close ' + (isClusterActive ? 'active' : '')}
+        onClick={() => this.deactivateCluster()} title="close cluster">
+          <RemoveIcon className="svg-fill-current" />
+        </div>
+
+        {/* Item hover */}        
+        <div className={'detailGraph__item-hover ' + (intersectionId ? 'active' : '')} style={hoverStyles}>
+          {itemHover}
+        </div>
       </div>
     );
   }
@@ -270,6 +328,8 @@ export const ConnectedDetailGraph = connect(
   ({ query, views }: StoreState, ownProps: ConnectedProps) => ({
     result: query.result,
     activeClusterId: views.graph.activeCluster,
+    intersectionId: views.graph.intersectionId,
+    intersectionPoint: views.graph.intersectionPoint,
   }),
 )(DetailGraph as any);
   

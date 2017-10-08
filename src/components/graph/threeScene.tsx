@@ -112,7 +112,11 @@ export class ThreeScene<T> extends React.Component<T, State> {
    * Custom click detection to distinguish drag from click behavior.
    */
   private handleMouseUp(event: React.MouseEvent<HTMLElement>) {
-    const distance = this.mouseDownPos.distanceTo(new THREE.Vector2(event.clientX, event.clientY); )
+    if (!this.mouseDownPos) {
+      return;
+    }
+    
+    const distance = this.mouseDownPos.distanceTo(new THREE.Vector2(event.clientX, event.clientY));
     if (distance < this.clickMoveThreshold) {
       this.handleCanvasClick(event);
     }
@@ -197,6 +201,16 @@ export class ThreeScene<T> extends React.Component<T, State> {
     DEBUG && console.log('threeScene: new camera position', this.camera.position);
   }
 
+  public getElementCoordinates(point: THREE.Vector3): THREE.Vector2 {
+    const projected = point.clone().project(this.camera);
+    const widthHalf = this.renderContainer.offsetWidth / 2;
+    const heightHalf = this.renderContainer.offsetHeight / 2;
+
+    return new THREE.Vector2(
+      ( projected.x * widthHalf ) + widthHalf,
+      - ( projected.y * heightHalf ) + heightHalf
+    );
+  }
 
   public render() {
     return (
