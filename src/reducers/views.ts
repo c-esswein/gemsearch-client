@@ -12,6 +12,9 @@ export interface ViewState {
     connectDialog: {
       isOpen: boolean,
     },
+    graph: {
+      activeCluster: string | null,
+    }
 }
 
 const initialState: ViewState = {
@@ -23,7 +26,10 @@ const initialState: ViewState = {
   },
   connectDialog: {
     isOpen: false,
-  }
+  },
+  graph: {
+    activeCluster: null,
+  },
 };
 
 export function viewReducer(state: ViewState = initialState, action: Actions): ViewState {
@@ -59,6 +65,14 @@ export function viewReducer(state: ViewState = initialState, action: Actions): V
         connectDialog: {
             ...state.connectDialog,
             isOpen: action.isOpen
+          }
+      };
+    case 'SET_GRAPH_CLUSTER_ACTIVE':
+      return { 
+        ...state, 
+        graph: {
+            ...state.graph,
+            activeCluster: action.clusterId
           }
       };
     default:

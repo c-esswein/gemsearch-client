@@ -1,7 +1,8 @@
 import { ViewModus, DataItem } from '../types';
 
 export type Actions = ChangeMainViewTypeAction 
-    | OpenItemDetailAction | CloseItemDetailAction | SetConnectDialogOpenStateAction;
+    | OpenItemDetailAction | CloseItemDetailAction | SetConnectDialogOpenStateAction
+    | SetGraphClusterActiveAction;
 
 export interface ChangeMainViewTypeAction {
     type: 'MAIN_VIEW_TYPE_CHANGE';
@@ -44,3 +45,17 @@ export function setConnectDialogOpenState(isOpen: boolean): SetConnectDialogOpen
         isOpen
     };
 }
+
+export interface SetGraphClusterActiveAction {
+    type: 'SET_GRAPH_CLUSTER_ACTIVE';
+    clusterId: string | null;
+}
+export function setGraphClusterActive(clusterId: string | null): SetGraphClusterActiveAction {
+    return {
+        type: 'SET_GRAPH_CLUSTER_ACTIVE',
+        clusterId
+    };
+}
+
+
+

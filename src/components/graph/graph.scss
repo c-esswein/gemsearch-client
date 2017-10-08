@@ -1,17 +1,40 @@
 
 .graph {
-    // background: #000;
+    position: relative;
+    margin-top: -1em;
 }
 
-// type color map
-.graph__type-colors {
-    display: flex;
-}
-.graph__type-color {
-    padding: 5px;
-    text-transform: uppercase;
-}
 
 .graph__canvas {
     overflow: hidden;
+}
+
+
+
+.detailGraph__cluster-close {
+    &:hover {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+    pointer-events: none;
+    transition: opacity .3s, transform .3s;
+    position: absolute;
+    top: 2em;
+    right: 2em;
+    cursor: pointer;
+
+    opacity: 0;
+    transform: scale(0.6);
+
+    svg {
+        width: 4em;
+        height: 4em;
+    }
+
+    &.active {
+        opacity: 0.8;
+        pointer-events: auto;
+        transform: scale(1);        
+        
+    }
 }

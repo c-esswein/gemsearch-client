@@ -15,7 +15,7 @@ import * as viewActions from 'actions/views';
 import { DispatchContext } from 'components/dispatchContextProvider';
 import { GraphIcon, ListIcon } from 'icons';
 import { ConnectedItemDetail } from 'components/itemDetail';
-import { DetailGraph } from 'components/graph/detailGraph';
+import { ConnectedDetailGraph } from 'components/graph/detailGraph';
 import * as spotifyApi from 'api/spotify';
 import { setCurrentUser } from 'actions/user';
 import { connect } from 'react-redux';
@@ -108,7 +108,7 @@ export class App extends React.Component<Props, null> {
     const renderTypeFilter = (filterName: string) => {
       const isActive = props.typeFilter.indexOf(filterName) > -1;
       return (
-        <div className={'app__type-filter ' + (isActive ? 'app__type-filter--active' : '')} 
+        <div key={filterName} className={'app__type-filter ' + (isActive ? 'app__type-filter--active' : '')} 
           title={'Filter for ' + filterName}
           onClick={() => this.handleTypeFilterClick(filterName)}>
           {filterName}
@@ -129,7 +129,7 @@ export class App extends React.Component<Props, null> {
         );
       } else {
         return (
-          <DetailGraph result={props.result} />
+          <ConnectedDetailGraph />
           // <Graph items={props.resultItems} />
         );        
       }

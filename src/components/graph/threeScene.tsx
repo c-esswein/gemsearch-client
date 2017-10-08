@@ -24,15 +24,20 @@ export class ThreeScene<T> extends React.Component<T, State> {
   protected camera: THREE.PerspectiveCamera;
   private controls: THREE.TrackballControls;
   protected mouse: THREE.Vector2 = new THREE.Vector2();
+  private mouseDownPos: THREE.Vector2;
+  /** max mouse move distance between mouse down-up to dispatch click event */
+  private clickMoveThreshold = 5;
   
   private shouldAnimate: boolean = false;
 
   constructor(props: T) {
     super(props);
 
-    this.handleMouseMove = this.handleMouseMove.bind(this);
     this.onWindowResize = this.onWindowResize.bind(this);
     this.animate_ = this.animate_.bind(this);
+    this.handleMouseDown = this.handleMouseDown.bind(this);
+    this.handleMouseMove = this.handleMouseMove.bind(this);
+    this.handleMouseUp = this.handleMouseUp.bind(this);
     this.handleCanvasClick = this.handleCanvasClick.bind(this);
     this.handleControlUpdate = this.handleControlUpdate.bind(this);
 
@@ -83,6 +88,13 @@ export class ThreeScene<T> extends React.Component<T, State> {
 
   }
 
+  /**
+   * Store mouse down position for custom click detection.
+   */
+  private handleMouseDown(event: React.MouseEvent<HTMLElement>) {
+    this.mouseDownPos = new THREE.Vector2(event.clientX, event.clientY);
+  }
+  
   private handleMouseMove(event: React.MouseEvent<HTMLElement>) {
     // calculate relative position
     const elPos = event.currentTarget.getBoundingClientRect();
@@ -94,6 +106,16 @@ export class ThreeScene<T> extends React.Component<T, State> {
 
     this.mouse.x = (clientX / width) * 2 - 1;
     this.mouse.y = - (clientY / height) * 2 + 1;
+  }
+
+  /**
+   * Custom click detection to distinguish drag from click behavior.
+   */
+  private handleMouseUp(event: React.MouseEvent<HTMLElement>) {
+    const distance = this.mouseDownPos.distanceTo(new THREE.Vector2(event.clientX, event.clientY); )
+    if (distance < this.clickMoveThreshold) {
+      this.handleCanvasClick(event);
+    }
   }
   
   /**
@@ -153,7 +175,7 @@ export class ThreeScene<T> extends React.Component<T, State> {
     this.renderer.render(this.scene, this.camera);
   }
 
-  public zoomToFit(boundingBox: number[][]) {
+  public zoomToFit(boundingBox: number[][], center: THREE.Vector3) {
     DEBUG && console.log('threeScene: zoom to fit', boundingBox);
 
     const aspect = this.camera.aspect;
@@ -166,35 +188,32 @@ export class ThreeScene<T> extends React.Component<T, State> {
     maxDim *= 1.1;
 
     const distance = maxDim/ 2 / aspect / fov;
-    const cameraPosition = new THREE.Vector3(
-      0,
-      0,
-      distance
-    );
+    // TODO: other camera position?
+    const cameraPosition = center.clone();
+    cameraPosition.z = distance;
     
     this.camera.position.copy(cameraPosition);
-    this.camera.lookAt(new THREE.Vector3(0, 0, 0));
+    this.camera.lookAt(center);
     DEBUG && console.log('threeScene: new camera position', this.camera.position);
   }
 
 
   public render() {
-
-    // TODO: render type colors in type filter and remove hints here
     return (
       <div className="graph">
-          <div className="graph__type-colors">
-            {Object.keys(TypeColors).map(type => (
-              <div className="graph__type-color" key={type} style={{color: '#' + TypeColors[type].toString(16)}}>
-                {type}
-              </div>
-            ))}
-          </div>
-          <div className="graph__canvas" 
-            style={this.state.showPointerCursor ? {cursor: 'pointer'} : null}
-            onClick={this.handleCanvasClick}
-            onMouseMove={this.handleMouseMove} ref={(el) => { this.renderContainer = el; }} />
+        <div className="graph__canvas" 
+          style={this.state.showPointerCursor ? {cursor: 'pointer'} : null}
+          onMouseDown={this.handleMouseDown} onMouseUp={this.handleMouseUp}
+          onMouseMove={this.handleMouseMove} ref={(el) => { this.renderContainer = el; }} />
+        {this.renderChildElements()}
       </div>
    );
+  }
+
+  /**
+   * Override and implement to add custom elements to view.
+   */
+  protected renderChildElements() {
+    return null;
   }
 }
