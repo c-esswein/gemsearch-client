@@ -45,19 +45,19 @@ export class Suggestions extends React.Component<Props, State> {
       this.props.onSuggestionSelected(item);
   }
 
+  private renderFilter(filter: string, isActive: boolean) {
+    const activeClass = isActive ? ' queryBar__suggestions-filter--active' : '';
+    
+    return (
+        <div key={filter} className={'queryBar__suggestions-filter' + activeClass} onClick={() => this.handleFilterClick(filter)}>
+            {filter}
+        </div>
+    );
+  }
+
   render() {
     const {items} = this.props;
-    const {activeTypeFilter} = this.state;
-
-    const renderFilter = (filter: string, isActive: boolean) => {
-        const activeClass = isActive ? ' queryBar__suggestions-filter--active' : '';
-        
-        return (
-            <div key={filter} className={'queryBar__suggestions-filter' + activeClass} onClick={() => this.handleFilterClick(filter)}>
-                {filter}
-            </div>
-        );
-    };
+    const {activeTypeFilter} = this.state;    
 
     let filteredItems = items;
     if (activeTypeFilter) {
@@ -67,8 +67,8 @@ export class Suggestions extends React.Component<Props, State> {
     return (
       <div className="queryBar__suggestions">
         <div className="queryBar__suggestions-filters">
-            {renderFilter('all', !activeTypeFilter)}
-            {filterItemTypes.map(filter => renderFilter(filter, filter === activeTypeFilter))}
+            {this.renderFilter('all', !activeTypeFilter)}
+            {filterItemTypes.map(filter => this.renderFilter(filter, filter === activeTypeFilter))}
         </div>
         <div className="queryBar__suggestions-items">
             {filteredItems.length === 0 ? 

@@ -18,19 +18,15 @@ export class ResultList extends React.Component<Props, null> {
 
   render() {
 
-    const renderItem = (item: DataItem) => {
-      return (
-        <ResultItem key={item.id} item={item} />
-      );
-    };
-
     // https://github.com/reactjs/react-transition-group/tree/v1-stable
     return (
       <CSSTransitionGroup component="div" className="resultList"
         transitionName="resultList__anim"
-        transitionEnterTimeout={800}
-        transitionLeaveTimeout={300}>
-        {this.props.items.map(renderItem)}
+        transitionEnterTimeout={1000}
+        transitionLeaveTimeout={500}>
+        {this.props.items.map((item) => (
+          <ResultItem key={item.id} item={item} />        
+        ))}
       </CSSTransitionGroup>
     );
   }

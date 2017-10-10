@@ -86,55 +86,45 @@ export class App extends React.Component<Props, null> {
     this.context.dispatch(filterAction);
   }
 
+  private renderViewLink(title: string, state: ViewModus) {
+    return (
+      <span 
+        className={'app__view-link ' + (this.props.viewModus === state ? 'app__view-link--active' : '')}
+        title={'Show results as ' + title}
+        onClick={this.handleViewChangeClick.bind(this, state)}>
+        {state === ViewModus.GRAPH ? 
+            <GraphIcon /> :
+            <ListIcon />
+        }
+        <span>{title}</span>
+      </span>
+    );
+  }
+
+  private renderMainView(hasQueryItems: boolean) {
+    const {viewModus, resultItems} = this.props;
+
+    if (!hasQueryItems) {
+      return (
+        <IntroPanel />
+      );
+    }
+
+    if (viewModus === ViewModus.LIST) {
+      return (
+        <ResultList items={resultItems} />
+      );
+    } else {
+      return (
+        <ConnectedDetailGraph />
+        // <Graph items={props.resultItems} />
+      );        
+    }
+  }
+
   render() {
     const props = this.props;
     const hasQueryItems = (props.queryItems.length > 0);
-
-    const renderViewLink = (title: string, state: ViewModus) => {
-      return (
-        <span 
-          className={'app__view-link ' + (props.viewModus === state ? 'app__view-link--active' : '')}
-          title={'Show results as ' + title}
-          onClick={this.handleViewChangeClick.bind(this, state)}>
-          {state === ViewModus.GRAPH ? 
-              <GraphIcon /> :
-              <ListIcon />
-          }
-          <span>{title}</span>
-        </span>
-      );
-    };
-
-    const renderTypeFilter = (filterName: string) => {
-      const isActive = props.typeFilter.indexOf(filterName) > -1;
-      return (
-        <div key={filterName} className={'app__type-filter ' + (isActive ? 'app__type-filter--active' : '')} 
-          title={'Filter for ' + filterName}
-          onClick={() => this.handleTypeFilterClick(filterName)}>
-          {filterName}
-        </div>
-      );
-    };
-
-    const renderMainView = () => {
-      if (!hasQueryItems) {
-        return (
-          <IntroPanel />
-        );
-      }
-
-      if (props.viewModus === ViewModus.LIST) {
-        return (
-          <ResultList items={props.resultItems} />
-        );
-      } else {
-        return (
-          <ConnectedDetailGraph />
-          // <Graph items={props.resultItems} />
-        );        
-      }
-    };
-
 
     return (
       <div className="app">
@@ -143,18 +133,27 @@ export class App extends React.Component<Props, null> {
         {hasQueryItems ? 
           <div className="app__filter">
             <div className="app__type-filters">
-              {filterItemTypes.map(renderTypeFilter)}
+              {filterItemTypes.map(filterName => {
+                const isActive = this.props.typeFilter.indexOf(filterName) > -1;
+                return (
+                  <div key={filterName} className={'app__type-filter ' + (isActive ? 'app__type-filter--active' : '')} 
+                    title={'Filter for ' + filterName}
+                    onClick={() => this.handleTypeFilterClick(filterName)}>
+                    {filterName}
+                  </div>
+                );
+              })}
             </div>
 
             <div className="app__view-links">
-              {renderViewLink('List', ViewModus.LIST)}
-              {renderViewLink('Graph', ViewModus.GRAPH)}
+              {this.renderViewLink('List', ViewModus.LIST)}
+              {this.renderViewLink('Graph', ViewModus.GRAPH)}
             </div>
           </div>
           : null 
         }
 
-        {renderMainView()}
+        {this.renderMainView(hasQueryItems)}
 
         <ConnectedPlayerBar />
 

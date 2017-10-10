@@ -116,18 +116,14 @@ export class QueryBar extends React.Component<Props, State> {
   render() {
     const {isFocused, suggestItems, textInput} = this.state;
 
-    const renderQueryItem = (item: DataItem) => {
-      return (
-        <QueryItem key={item.id} item={item} actionText="remove from query" mode="remove" onActionClick={this.handleRemoveItem} />
-      );
-    };
-
     return (
       <div className="queryBar" ref={ref => this.elRef = ref}>
         <div className="queryBar__control">
           <SearchIcon className="svg-inline svg-fill-current queryBar__icon" />
           <div className="queryBar__q-items">
-            {this.props.queryItems.map(renderQueryItem)}
+            {this.props.queryItems.map(item => (
+              <QueryItem key={item.id} item={item} actionText="remove from query" mode="remove" onActionClick={this.handleRemoveItem} />        
+            ))}
           </div>
           <input type="text" className="queryBar__input" 
             onChange={this.handleTextInputChange} onKeyDown={this.handleKeyDown as any}
