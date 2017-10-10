@@ -1,6 +1,10 @@
 
 @import "constants.scss";
 
+.itemDetail--closed {
+    pointer-events: none;
+}
+
 .itemDetail__container {
     position: fixed;
     top: 0;
@@ -15,14 +19,19 @@
     width: 100%;
     height: 100%;
     background: #000;
-    opacity: .6;
+    opacity: 0;
+    transition: opacity .4s;
+    
+    .itemDetail--open & {
+        opacity: .6;
+    }
 }
 
 .itemDetail {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate3d(-50%, -50%, 0);
+    transform: translate3d(-50%, -40%, 0);
     width: 800px;
     max-width: 100%;
     box-sizing: border-box;
@@ -33,6 +42,13 @@
 
     @media only screen and (max-width: 600px) {
         display: block;
+    }
+
+    opacity: 0;
+    transition: opacity .4s, transform .3s;
+    .itemDetail--open & {
+        opacity: 1;
+        transform: translate3d(-50%, -50%, 0);    
     }
 
     .item__image {
@@ -47,6 +63,7 @@
 
 .itemDetail__main {
     flex: 1;
+    overflow: hidden;
 
     @media only screen and (max-width: 600px) {
         margin-top: 2em;
@@ -57,6 +74,33 @@
     text-transform: uppercase;
     font-size: .7em;
     margin-bottom: .3em;
+          
+}
+
+.textappear-anim {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+
+    &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: currentColor;
+    }
+    
+    transform: translate3d(-100%, 0, 0);
+    .itemDetail--open & {
+        transition: transform 0.3s 0.2s;
+        transform: translate3d(0, 0, 0);
+        &:before {
+            transition: transform 0.3s 0.5s;
+            transform: translate3d(100%, 0, 0);
+        }        
+    }
 }
 
 .itemDetail__name {

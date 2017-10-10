@@ -9,13 +9,13 @@ import { ConnectedPlayerBar } from 'components/playerBar';
 import { Graph } from 'components/graph/graph';
 import { QueryBar } from 'components/queryBar/queryBar';
 import { DataItem } from 'types';
-import { queryForItems, QueryServerResult } from 'api/query';
+import { queryForItems } from 'api/query';
 import * as queryActions from 'actions/query';
 import * as viewActions from 'actions/views';
 import { DispatchContext } from 'components/dispatchContextProvider';
 import { GraphIcon, ListIcon } from 'icons';
 import { ConnectedItemDetail } from 'components/itemDetail';
-import { ConnectedDetailGraph } from 'components/graph/detailGraph';
+import { DetailGraph } from 'components/graph/detailGraph';
 import * as spotifyApi from 'api/spotify';
 import { setCurrentUser } from 'actions/user';
 import { connect } from 'react-redux';
@@ -25,13 +25,11 @@ import { ConnectedConnectDialog } from 'components/connectDialog';
 
 
 export interface Props {
-  resultItems: DataItem[];
-  result: QueryServerResult;
   queryItems: DataItem[];
-
   typeFilter: string[];
   viewModus: ViewModus;
 }
+
 
 export class App extends React.Component<Props, null> {
 
@@ -61,21 +59,6 @@ export class App extends React.Component<Props, null> {
     }
   }
 
-  componentWillReceiveProps(nextProps: Props) {
-    if (nextProps.queryItems !== this.props.queryItems ||
-      nextProps.typeFilter !== this.props.typeFilter) {
-      this.queryForItems(nextProps.queryItems, nextProps.typeFilter);
-    }
-  }
-
-  /**
-   * Query api for items.
-   */
-  private queryForItems(query: DataItem[], typeFilter: string[]) {
-    queryForItems(query, typeFilter)
-      .then(data => this.context.dispatch(queryActions.receiveItems(data)));
-  }
-
   private handleViewChangeClick(viewState: ViewModus) {
     const viewChangeAction = viewActions.changeMainViewType(viewState);
     this.context.dispatch(viewChangeAction);
@@ -102,7 +85,7 @@ export class App extends React.Component<Props, null> {
   }
 
   private renderMainView(hasQueryItems: boolean) {
-    const {viewModus, resultItems} = this.props;
+    const {viewModus, queryItems, typeFilter} = this.props;
 
     if (!hasQueryItems) {
       return (
@@ -112,29 +95,29 @@ export class App extends React.Component<Props, null> {
 
     if (viewModus === ViewModus.LIST) {
       return (
-        <ResultList items={resultItems} />
+        <ResultList queryItems={queryItems} typeFilter={typeFilter} />
       );
     } else {
       return (
-        <ConnectedDetailGraph />
+        <DetailGraph queryItems={queryItems} typeFilter={typeFilter} />
         // <Graph items={props.resultItems} />
       );        
     }
   }
 
   render() {
-    const props = this.props;
-    const hasQueryItems = (props.queryItems.length > 0);
+    const {queryItems, typeFilter} = this.props;
+    const hasQueryItems = (queryItems && queryItems.length > 0);
 
     return (
       <div className="app">
-        <QueryBar queryItems={props.queryItems} />
+        <QueryBar queryItems={queryItems} />
         
         {hasQueryItems ? 
           <div className="app__filter">
             <div className="app__type-filters">
               {filterItemTypes.map(filterName => {
-                const isActive = this.props.typeFilter.indexOf(filterName) > -1;
+                const isActive = typeFilter.indexOf(filterName) > -1;
                 return (
                   <div key={filterName} className={'app__type-filter ' + (isActive ? 'app__type-filter--active' : '')} 
                     title={'Filter for ' + filterName}
@@ -173,8 +156,6 @@ export interface ConnectedProps extends Props {
 
 export const ConnectedApp = connect(
   ({ query, views, user }: StoreState, ownProps: ConnectedProps) => ({
-    resultItems: query.resultItems,
-    result: query.result,
     queryItems: query.queryItems,
     typeFilter: query.typeFilter,
     viewModus: views.app.viewModus,

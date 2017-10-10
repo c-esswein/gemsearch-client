@@ -6,7 +6,7 @@ export type Position3D = number[];
 export type Cluster = DataItem[];
 
 export interface QueryServerResult {
-    data: DataItem[],
+    // data: DataItem[],
     boundingBox: Position3D[],
     clusters: Cluster[],
 }
@@ -14,16 +14,35 @@ export interface QueryServerResult {
 /**
  * Query GEM for items. 
  */
-export function queryForItems(query: DataItem[], typeFilter: string[]) {
+export function queryForItems(query: DataItem[], typeFilter: string[], limit = 30, offset = 0): Promise<DataItem[]> {
     const queryIds = query.map(item => item.id);
 
     const params = {
         'ids': queryIds.join('|'),
         'types': typeFilter.join('|'),
-        'minClusterDistance': 0.1
+        'limit': limit,
+        'offset': offset
     };
     
-    return serverFetch('/api/query?', params) as Promise<QueryServerResult>;
+    return serverFetch('/api/query?', params)
+        .then(result => result.data);
+}
+
+/**
+ * Query GEM for items including 3D viz data. 
+ */
+export function queryForItemsForGraph(query: DataItem[], typeFilter: string[], limit = 30, offset = 0) {
+    const queryIds = query.map(item => item.id);
+
+    const params = {
+        'ids': queryIds.join('|'),
+        'types': typeFilter.join('|'),
+        'minClusterDistance': 0.1,
+        'limit': limit,
+        'offset': offset
+    };
+    
+    return serverFetch('/api/query_viz?', params) as Promise<QueryServerResult>;
 }
 
 /**

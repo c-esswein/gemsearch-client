@@ -46,10 +46,17 @@
     font-size: 0.9em;
     background: #fff;
     margin-left: 1em;
+    box-shadow: 0 0px 10px rgba(0,0,0,0.2);    
+    transform: translate3d(10%, 0, 0);
 
     &.active {
-        transition: opacity 0.3s;
+        transition: opacity 0.4s, transform 0.4s;
         opacity: 1;
+        transform: translate3d(0, 0, 0);    
     }
 }
+
+    .detailGraph__item-hover-name {
+        font-weight: bold;
+    }
 

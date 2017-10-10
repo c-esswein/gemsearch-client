@@ -8,7 +8,7 @@ import {TweenLite} from 'gsap';
 
 export class GraphItem {
 
-  private model: DataItem;
+  public model: DataItem;
   private itemGroup: THREE.Group;
 
   constructor(model: DataItem) {

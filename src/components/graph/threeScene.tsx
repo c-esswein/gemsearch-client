@@ -7,7 +7,7 @@ import { LAYOUT_CONFIG } from 'components/graph';
 
 require('./graph.scss');
 
-interface State {
+export interface State {
   showPointerCursor: boolean;
 }
 
@@ -16,7 +16,7 @@ const DEBUG = true;
 /**
  * Base class for creating three js scenes.
  */
-export class ThreeScene<T> extends React.Component<T, State> {
+export class ThreeScene<T, M extends State> extends React.Component<T, M> {
 
   private renderContainer: HTMLElement;
   private renderer: THREE.WebGLRenderer;
@@ -27,6 +27,8 @@ export class ThreeScene<T> extends React.Component<T, State> {
   private mouseDownPos: THREE.Vector2;
   /** max mouse move distance between mouse down-up to dispatch click event */
   private clickMoveThreshold = 5;
+
+  private sceneCameraPos: THREE.Vector3 = new THREE.Vector3();
   
   private shouldAnimate: boolean = false;
 
@@ -40,10 +42,6 @@ export class ThreeScene<T> extends React.Component<T, State> {
     this.handleMouseUp = this.handleMouseUp.bind(this);
     this.handleCanvasClick = this.handleCanvasClick.bind(this);
     this.handleControlUpdate = this.handleControlUpdate.bind(this);
-
-    this.state = {
-      showPointerCursor: false
-    };
   }
 
   componentDidMount() {
@@ -106,6 +104,15 @@ export class ThreeScene<T> extends React.Component<T, State> {
 
     this.mouse.x = (clientX / width) * 2 - 1;
     this.mouse.y = - (clientY / height) * 2 + 1;
+
+  }
+
+  private applyTiltEffect() {
+    // tilt effect:
+    const lookAtVector = new THREE.Vector3(0, 0, -1);
+    lookAtVector.applyQuaternion(this.camera.quaternion);
+
+    // TODO: finalize
   }
 
   /**
@@ -129,8 +136,11 @@ export class ThreeScene<T> extends React.Component<T, State> {
     
   }
 
+  /**
+   * Handles update of trackball controls camera adjustment.
+   */
   protected handleControlUpdate() {
-    this.renderGL();
+    // this.sceneCameraPos = this.camera.position.clone();
   }
 
   private onWindowResize() {
@@ -148,24 +158,44 @@ export class ThreeScene<T> extends React.Component<T, State> {
     this.renderer.setSize(width, height);
   }
 
+  /**
+   * Set pointer state for mouse on canvas hover.
+   */
   public setPointerCursor(showPointer = false) {
     if (this.state.showPointerCursor !== showPointer) {
       this.setState({showPointerCursor: showPointer});
     }
   }
 
+  /**
+   * Starts animating scene.
+   */
   public startAnimating() {
     this.shouldAnimate = true;
     this.animate_();
   }
 
+  /**
+   * Called on each animation step.
+   */
   private animate_() {
     if (this.shouldAnimate) {
       this.controls.update();
+      // this.applyCameraTilt();
       this.onAnimate();
       this.renderGL();
       requestAnimationFrame(this.animate_);
     }
+  }
+
+  private applyCameraTilt() {
+    const mouseTarget = this.sceneCameraPos.clone();
+    mouseTarget.x += this.mouse.x * 100;
+    mouseTarget.y += this.mouse.y * 100;
+
+    this.camera.position.x += (mouseTarget.x - this.camera.position.x) * 0.1;
+    this.camera.position.y += (mouseTarget.y - this.camera.position.y) * 0.1;
+    // this.camera.position.y += (((this.sceneCameraPos.y * (this.mouse.y + 1)) - this.camera.position.y) * 0.1);
   }
 
   /**
@@ -175,10 +205,16 @@ export class ThreeScene<T> extends React.Component<T, State> {
   protected onAnimate() {
   }
 
+  /**
+   * Renders scene to canvas. Should only be called within animate! (within animation frame)
+   */
   private renderGL() {
     this.renderer.render(this.scene, this.camera);
   }
 
+  /**
+   * Adjust scene camera position to show bounding box on given center.
+   */
   public zoomToFit(boundingBox: number[][], center: THREE.Vector3) {
     DEBUG && console.log('threeScene: zoom to fit', boundingBox);
 
@@ -191,7 +227,7 @@ export class ThreeScene<T> extends React.Component<T, State> {
     maxDim *= LAYOUT_CONFIG.scalingFac;
     maxDim *= 1.1;
 
-    const distance = maxDim/ 2 / aspect / fov;
+    const distance = maxDim / 2 / aspect / fov;
     // TODO: other camera position?
     const cameraPosition = center.clone();
     cameraPosition.z = distance;
@@ -201,6 +237,9 @@ export class ThreeScene<T> extends React.Component<T, State> {
     DEBUG && console.log('threeScene: new camera position', this.camera.position);
   }
 
+  /**
+   * Returns 2D position on canvas for given scene 3D point.
+   */
   public getElementCoordinates(point: THREE.Vector3): THREE.Vector2 {
     const projected = point.clone().project(this.camera);
     const widthHalf = this.renderContainer.offsetWidth / 2;

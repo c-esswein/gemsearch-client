@@ -78,6 +78,12 @@ export class ItemDetail extends React.Component<Props, State> {
   private renderImage() {
     const item = this.props.item;
 
+    if (!item) {
+      return (
+        <div className="resultItem__img resultItem__img--empty"></div>
+      );
+    }
+
     if (item.meta && item.meta.images && item.meta.images.length > 0) {
       const imageVersion = item.meta.images.find(image => image.width === 300) || item.meta.images[0];
 
@@ -119,9 +125,13 @@ export class ItemDetail extends React.Component<Props, State> {
   renderTitle() {
     const item = this.props.item;
 
+    if (!item) {
+      return <span></span>;
+    }
+
     if (item.meta && item.meta.uri) {
         return (
-            <a className="itemDetail__name" href={item.meta.uri} title="View on Spotify">{item.name}</a>
+            <a className="itemDetail__name textappear-anim" href={item.meta.uri} title="View on Spotify">{item.name}</a>
         );
     } else {
       return (
@@ -158,19 +168,15 @@ export class ItemDetail extends React.Component<Props, State> {
   render() {
     const { item, isOpen } = this.props;
 
-    if (!isOpen) {
-        return null;
-    }
-
     return (
-      <div className="itemDetail__container"> 
+      <div className={'itemDetail__container ' + (isOpen ? 'itemDetail--open' : 'itemDetail--closed')}> 
         <div className="itemDetail__overlay" onClick={this.handleRequestClose}></div>   
         <div className="itemDetail">
           <div className="itemDetail__left">
-            {item.type !== 'tag' ? this.renderImage() : null}
+            {this.renderImage()}
           </div>
           <div className="itemDetail__main">
-            <div className="itemDetail__type">{item.type}</div>
+            <div className="itemDetail__type textappear-anim">{item ? item.type : ''}</div><br />
             {this.renderTitle()}
             <div className="itemDetail__neighbors">
               {this.renderNeighbors()}

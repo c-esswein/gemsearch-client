@@ -6,17 +6,22 @@ import {TrackballControls} from 'misc/TrackballControls';
 import { xFetch } from 'utils';
 import { TypeColors } from 'constants/colors';
 import { ThreeScene } from 'components/graph/threeScene';
+import { State as ThreeSceneState } from 'components/graph/threeScene';
 
 require('./graph.scss');
 
-export interface Props {
+interface Props {
   items: DataItem[];
+}
+
+interface State {
+
 }
 
 /**
  * Three.js Graph visualization.
  */
-export class Graph extends ThreeScene<Props> {
+export class Graph extends ThreeScene<Props, State & ThreeSceneState> {
 
   private INTERSECTED: boolean;
   private positions: Float32Array;
