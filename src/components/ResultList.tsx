@@ -4,6 +4,7 @@ import { CSSTransitionGroup } from 'react-transition-group' ;
 import { DataItem } from 'types';
 import * as queryActions from 'actions/query';
 import { queryForItems } from 'api/query';
+import { LoadingIndicator } from 'components/loadingIndicator';
 
 require('./resultList.scss');
 
@@ -88,7 +89,7 @@ export class ResultList extends React.Component<Props, State> {
 
 
   render() {
-    const {resultItems = []} = this.state;
+    const {resultItems = [], isLoading} = this.state;
 
     // https://github.com/reactjs/react-transition-group/tree/v1-stable
     return (
@@ -108,7 +109,10 @@ export class ResultList extends React.Component<Props, State> {
           ))}
         </div>
         <div className="resultList__btn-wrap">
-          <div className="btn-raised resultList__more-btn" onClick={this.handleLoadMoreClick}>Load more results</div>
+          {isLoading? 
+            <LoadingIndicator />
+            : <div className="btn-raised resultList__more-btn" onClick={this.handleLoadMoreClick}>Load more results</div>
+          }
         </div>
       </div>
     );
