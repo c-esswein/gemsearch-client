@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { DataItem, Track } from 'types';
 import { RemoveIcon, PlayIcon } from 'icons';
+import { SuggestionItem } from 'api/query';
 
 
 export interface Props {
-  item: DataItem;
+  item: DataItem | SuggestionItem;
   onActionClick: (item: DataItem) => void;
   actionText?: string;
   mode: 'remove' | 'item_select';
@@ -52,14 +53,18 @@ export class QueryItem extends React.Component<Props, {}> {
   }
 
   render() {
-    const item = this.props.item;
+    const item = this.props.item as SuggestionItem;
 
     return (
       <div className="queryBar__item" key={item.id} onClick={this.handleItemClick}>
         {this.renderImage()}
         <div className="queryBar__item-inner">
           <div className="queryBar__item-type">{item.type}</div>
-          <span className="queryBar__item-name" title={item.name}>{item.name}</span>
+          {item.highlightName ? 
+            <span className="queryBar__item-name" title={item.name} dangerouslySetInnerHTML={{__html: item.highlightName}}></span>
+            : 
+            <span className="queryBar__item-name" title={item.name}>{item.name}</span>
+          }
 
           {(this.props.mode === 'remove') ? 
             <span className="queryBar__item-remove" onClick={this.handleRemoveClick} title={this.props.actionText}>

@@ -48,6 +48,21 @@
 
         &:hover {
             color: $colorActive;    
+            .queryBar__item-name, em {
+                color: $colorActive;
+            }
+        }
+    }
+
+    .queryBar__item-name {
+        color: rgba(28, 24, 37, 0.72);
+        font-style: italic;
+        max-width: 300px;
+        
+        // highlight es result
+        em {
+            font-style: normal;
+            color: #1c1825;        
         }
     }
 }

@@ -6,7 +6,7 @@ import { QueryItem } from 'components/queryBar/queryItem';
 import { DispatchContext } from 'components/dispatchContextProvider';
 import { SearchIcon } from 'icons';
 import { Suggestions } from 'components/queryBar/suggestions';
-import { getSuggestForItems } from 'api/query';
+import { getSuggestForItems, SuggestionItem } from 'api/query';
 import { ConnectedAuthControl } from 'components/authControl';
 import { SpotifyUser } from 'api/spotify';
 
@@ -18,7 +18,7 @@ export interface Props {
 
 interface State {
   textInput: string,
-  suggestItems: DataItem[];
+  suggestItems: SuggestionItem[];
   isFocused: boolean;
 }
 

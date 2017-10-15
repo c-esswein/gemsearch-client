@@ -11,6 +11,10 @@ export interface QueryServerResult {
     clusters: Cluster[],
 }
 
+export type SuggestionItem = DataItem & {
+    highlightName: string,
+};
+
 /**
  * Query GEM for items. 
  */
@@ -48,6 +52,6 @@ export function queryForItemsForGraph(query: DataItem[], typeFilter: string[], l
 /**
  * Get suggestions of items to autocomplete term.
  */
-export function getSuggestForItems(searchTerm: string) {
+export function getSuggestForItems(searchTerm: string): Promise<{data: SuggestionItem[]}> {
     return serverFetch('/api/suggest/' + searchTerm.trim());
 }

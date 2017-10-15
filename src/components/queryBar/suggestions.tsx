@@ -1,13 +1,13 @@
 import * as React from 'react';
-import { DataItem } from 'types';
 import { filterItemTypes } from 'constants/itemTypes';
 import { QueryItem } from 'components/queryBar/queryItem';
+import { SuggestionItem } from 'api/query';
 
 require('./suggestions.scss');
 
 export interface Props {
-  items: DataItem[];
-  onSuggestionSelected: (item: DataItem) => void;
+  items: SuggestionItem[];
+  onSuggestionSelected: (item: SuggestionItem) => void;
 }
 
 interface State {
@@ -41,7 +41,7 @@ export class Suggestions extends React.Component<Props, State> {
       }
   }
 
-  private handleItemClick(item: DataItem) {
+  private handleItemClick(item: SuggestionItem) {
       this.props.onSuggestionSelected(item);
   }
 
