@@ -55,3 +55,12 @@ export function queryForItemsForGraph(query: DataItem[], typeFilter: string[], l
 export function getSuggestForItems(searchTerm: string): Promise<{data: SuggestionItem[]}> {
     return serverFetch('/api/suggest/' + searchTerm.trim());
 }
+
+/**
+ * Returns graph neighbors for given node.
+ */
+export function getNeighbors(nodeId: string, typeFilter: string[]): Promise<{nodes: DataItem[]}> {
+    return serverFetch('/api/neighbors/' + nodeId, {
+        'types': typeFilter.join('|')
+    });   
+}

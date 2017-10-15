@@ -6,7 +6,8 @@ import * as playerActions from 'actions/player';
 import * as viewActions from 'actions/views';
 import * as queryActions from 'actions/query';
 import { xFetch } from 'utils';
-
+import { LoadingIndicator } from 'components/loadingIndicator';
+import { filterItemTypes } from 'constants/itemTypes';
 
 require('./itemDetail.scss');
 
@@ -32,10 +33,11 @@ export class ItemDetail extends React.Component<Props, State> {
       super(props);
 
       this.state = {
-        neighbors: []
+        neighbors: null
       };
 
       this.handlePlayClick = this.handlePlayClick.bind(this);
+      this.handleNeighborClick = this.handleNeighborClick.bind(this);
       this.handleFilterClick_ = this.handleFilterClick_.bind(this);
       this.handleRequestClose = this.handleRequestClose.bind(this);
   }
@@ -43,12 +45,11 @@ export class ItemDetail extends React.Component<Props, State> {
   componentWillReceiveProps(nextProps: Props) {
     if (nextProps.item !== this.props.item) {
       
-      // TODO: do not use state!
-      xFetch('/api/neighbors/' + nextProps.item.id)
-        .then(response => response.json())
-        .then(json => this.setState({
-          neighbors: json.nodes
-        }));
+      getNeighbors(nextProps.item.id, filterItemTypes).then(result => 
+        this.setState({
+          neighbors: result.nodes
+        })
+      );
       
     }
   }
@@ -61,6 +62,21 @@ export class ItemDetail extends React.Component<Props, State> {
     );
   }
 
+  private handleNeighborClick(item: DataItem) {
+    if (item.type === 'track') {
+      this.context.dispatch(
+        playerActions.playTrack(item as Track)
+      );
+    } else {
+      this.context.dispatch(
+        viewActions.openItemDetail(item)
+      );
+    }
+
+  }
+
+
+
   private handleFilterClick_(e: React.MouseEvent<HTMLElement>) {
     this.context.dispatch(queryActions.addQueryItem(this.props.item));
   }
@@ -71,7 +87,7 @@ export class ItemDetail extends React.Component<Props, State> {
       );
       
       this.state = {
-        neighbors: []
+        neighbors: null
       };
   }
 
@@ -120,45 +136,34 @@ export class ItemDetail extends React.Component<Props, State> {
       <div className="resultItem__img resultItem__img--empty"></div>
     );
   }
-  
-
-  renderTitle() {
-    const item = this.props.item;
-
-    if (!item) {
-      return <span></span>;
-    }
-
-    if (item.meta && item.meta.uri) {
-        return (
-            <a className="itemDetail__name textappear-anim" href={item.meta.uri} title="View on Spotify">{item.name}</a>
-        );
-    } else {
-      return (
-          <span>{item.name}</span>
-      );
-    }
-  }
 
   private renderNeighbors() {
+    if (this.state.neighbors === null) {
+      return <LoadingIndicator />;
+    }
+
     return this.state.neighbors.map(item => {
       if (item.type === 'track') {
-        const handlePlayClick = () => {
-          this.context.dispatch(
-            playerActions.playTrack(item as Track)
-          );
-        };
         return (
-          <div className="smallTrackInfo" key={item.id} onClick={handlePlayClick}>
-            <PlayIcon />
-            <span className="smallTrackInfo__name">{item.name}</span>
+          <div className="itemDetail__neighbor" key={item.id} onClick={() => this.handleNeighborClick(item)}>
+            <div className="itemDetail__neighbor-type">
+              {item.type}
+            </div>
+            <div className="itemDetail__neighbor-name smallTrackInfo">
+              <PlayIcon />
+              <span className="smallTrackInfo__name">{item.name}</span>
+            </div>
           </div>
         );
       } else {
         return (
-          <div key={item.id}>
-            {item.type}:
-            {item.name}
+          <div className="itemDetail__neighbor" key={item.id} onClick={() => this.handleNeighborClick(item)}>
+            <div className="itemDetail__neighbor-type">
+              {item.type}
+            </div>
+            <div className="itemDetail__neighbor-name">
+              {item.name}
+            </div>
           </div>
         );
       }
@@ -176,8 +181,8 @@ export class ItemDetail extends React.Component<Props, State> {
             {this.renderImage()}
           </div>
           <div className="itemDetail__main">
-            <div className="itemDetail__type textappear-anim">{item ? item.type : ''}</div><br />
-            {this.renderTitle()}
+            <div className="itemDetail__type textappear-anim">{item ? item.type : ''}</div>
+            <span className="itemDetail__name textappear-anim">{item ? item.name : ''}</span>
             <div className="itemDetail__neighbors">
               {this.renderNeighbors()}
             </div>
@@ -192,6 +197,7 @@ export class ItemDetail extends React.Component<Props, State> {
 
 import { connect } from 'react-redux';
 import { StoreState, ViewModus } from 'types';
+import { getNeighbors } from 'api/query';
 
 export interface ConnectedProps {
 

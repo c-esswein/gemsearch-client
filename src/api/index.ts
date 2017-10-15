@@ -10,7 +10,11 @@ export function processServerResp(response: any) {
 }
 
 export function serverFetch(route: string, params?: Object, init?: RequestInit) {
-    return fetch(route + queryParams(params), init)
+    const paramStr = queryParams(params);
+    if (paramStr && !route.endsWith('?')) {
+        route = route + '?';
+    }
+    return fetch(route + paramStr, init)
         .then(response => response.json())
         .then(processServerResp);
 }
