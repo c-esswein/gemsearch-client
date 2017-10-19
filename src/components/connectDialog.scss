@@ -47,6 +47,7 @@
     padding: 4em;
     background: #fff;
     box-shadow: 0 -3px 17px rgba(0,0,0,0.2);
+    line-height: 1.5;
 
     // appear animation
     transition: all 0.3s;    
@@ -80,6 +81,10 @@
 
     p {
         line-height: 1.5;
+    }
+
+    .loader {
+        margin-top: 1em;
     }
 }
 
