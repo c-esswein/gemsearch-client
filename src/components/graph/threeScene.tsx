@@ -12,6 +12,7 @@ export interface State {
 }
 
 const DEBUG = true;
+const CHANGE_THRESHOLD = 10;
 
 /**
  * Base class for creating three js scenes.
@@ -91,6 +92,7 @@ export class ThreeScene<T, M extends State> extends React.Component<T, M> {
    */
   private handleMouseDown(event: React.MouseEvent<HTMLElement>) {
     this.mouseDownPos = new THREE.Vector2(event.clientX, event.clientY);
+
   }
   
   private handleMouseMove(event: React.MouseEvent<HTMLElement>) {
@@ -104,15 +106,13 @@ export class ThreeScene<T, M extends State> extends React.Component<T, M> {
 
     this.mouse.x = (clientX / width) * 2 - 1;
     this.mouse.y = - (clientY / height) * 2 + 1;
-
   }
 
-  private applyTiltEffect() {
-    // tilt effect:
+
+  public getCameraLookAt() {
     const lookAtVector = new THREE.Vector3(0, 0, -1);
     lookAtVector.applyQuaternion(this.camera.quaternion);
-
-    // TODO: finalize
+    return lookAtVector;
   }
 
   /**
@@ -140,7 +140,17 @@ export class ThreeScene<T, M extends State> extends React.Component<T, M> {
    * Handles update of trackball controls camera adjustment.
    */
   protected handleControlUpdate() {
-    // this.sceneCameraPos = this.camera.position.clone();
+    const cameraPos = this.camera.position.clone();
+    const change = this.sceneCameraPos.distanceToSquared(cameraPos);
+
+    if (change > CHANGE_THRESHOLD) {
+      this.sceneCameraPos = cameraPos;
+      this.onCameraUpdate();
+    }
+  }
+
+  protected onCameraUpdate() {
+
   }
 
   private onWindowResize() {
@@ -150,7 +160,8 @@ export class ThreeScene<T, M extends State> extends React.Component<T, M> {
 
   private setRendererSize() {
     const width = this.renderContainer.offsetWidth;
-    let height = window.innerHeight - this.renderContainer.offsetTop;
+    const boundingBox = this.renderContainer.getBoundingClientRect();
+    let height = window.innerHeight - boundingBox.top - 20;
     height = Math.max(height, 300);
 
     this.camera.aspect = width / height;
@@ -171,8 +182,10 @@ export class ThreeScene<T, M extends State> extends React.Component<T, M> {
    * Starts animating scene.
    */
   public startAnimating() {
-    this.shouldAnimate = true;
-    this.animate_();
+    if (!this.shouldAnimate) {
+      this.shouldAnimate = true;
+      this.animate_();
+    }
   }
 
   /**
@@ -187,7 +200,7 @@ export class ThreeScene<T, M extends State> extends React.Component<T, M> {
       requestAnimationFrame(this.animate_);
     }
   }
-
+/* 
   private applyCameraTilt() {
     const mouseTarget = this.sceneCameraPos.clone();
     mouseTarget.x += this.mouse.x * 100;
@@ -196,7 +209,7 @@ export class ThreeScene<T, M extends State> extends React.Component<T, M> {
     this.camera.position.x += (mouseTarget.x - this.camera.position.x) * 0.1;
     this.camera.position.y += (mouseTarget.y - this.camera.position.y) * 0.1;
     // this.camera.position.y += (((this.sceneCameraPos.y * (this.mouse.y + 1)) - this.camera.position.y) * 0.1);
-  }
+  } */
 
   /**
    * Called in each render call.
@@ -234,6 +247,7 @@ export class ThreeScene<T, M extends State> extends React.Component<T, M> {
     
     this.camera.position.copy(cameraPosition);
     this.camera.lookAt(center);
+    this.sceneCameraPos = center.clone();    
     DEBUG && console.log('threeScene: new camera position', this.camera.position);
   }
 

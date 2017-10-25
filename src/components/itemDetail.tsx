@@ -28,7 +28,6 @@ export class ItemDetail extends React.Component<Props, State> {
   };
   context: DispatchContext;
 
-
   constructor(props: Props) {
       super(props);
 
@@ -44,6 +43,11 @@ export class ItemDetail extends React.Component<Props, State> {
 
   componentWillReceiveProps(nextProps: Props) {
     if (nextProps.item !== this.props.item) {
+
+      // remove previous neighbor list and load new ones
+      this.setState({
+        neighbors: null,
+      });
       
       getNeighbors(nextProps.item.id, filterItemTypes).then(result => 
         this.setState({
@@ -85,10 +89,6 @@ export class ItemDetail extends React.Component<Props, State> {
       this.context.dispatch(
           viewActions.closeItemDetail()
       );
-      
-      this.state = {
-        neighbors: null
-      };
   }
 
   private renderImage() {
@@ -139,7 +139,7 @@ export class ItemDetail extends React.Component<Props, State> {
 
   private renderNeighbors() {
     if (this.state.neighbors === null) {
-      return <LoadingIndicator />;
+      return <LoadingIndicator inverted={true} />;
     }
 
     return this.state.neighbors.map(item => {

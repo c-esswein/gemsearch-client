@@ -3,13 +3,13 @@ import * as React from 'react';
 import * as THREE from 'three';
 import { DataItem, ItemType, StoreState } from 'types';
 import { DispatchContext } from 'components/dispatchContextProvider';
-import { xFetch } from 'utils';
+import { xFetch, throttle } from 'utils';
 import { TypeColors } from 'constants/colors';
 import { ThreeScene } from 'components/graph/threeScene';
 import { State as ThreeSceneState } from 'components/graph/threeScene';
 import * as viewActions from 'actions/views';
 import { GraphItem } from 'components/graph/graphItem';
-import { QueryServerResult, queryForItemsForGraph } from 'api/query';
+import { QueryServerResult, queryForItemsForGraph, queryGraphItemsAround } from 'api/query';
 import { Cluster } from 'components/graph/cluster';
 import { RemoveIcon } from 'icons';
 
@@ -29,7 +29,7 @@ interface State {
 }
 
 const DEBUG = true;
-const ITEMS_PER_REQUEST = 30;
+const ITEMS_PER_REQUEST = 100;
 
 /**
  * Three.js Graph visualization.
@@ -38,6 +38,7 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
 
   private items: GraphItem[];
   private clusters: Map<string, Cluster>;
+  private clusterCounter: number;
   private activeCluster: Cluster;
   private raycaster: THREE.Raycaster;
   private intersectionMeshes: THREE.Object3D[];
@@ -69,6 +70,8 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
 
     this.handleCanvasClick = this.handleCanvasClick.bind(this);
     this.handleItemsLoaded = this.handleItemsLoaded.bind(this);
+    this.loadMoreItems = throttle(this.loadMoreItems.bind(this), 200, {leading: false, trailing: false});
+    this.renderItems = this.renderItems.bind(this);
   }
 
   componentWillMount(): void {
@@ -96,8 +99,17 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
       isLoading: true,
     });
 
+    // TODO: use cancleable promise
     queryForItemsForGraph(queryItems, typeFilter, ITEMS_PER_REQUEST, offset)
       .then(this.handleItemsLoaded);
+  }
+
+  private loadMoreItems(vec: THREE.Vector3) {
+    const {typeFilter} = this.props;
+    const offset = 0;
+
+    queryGraphItemsAround(vec.toArray(), typeFilter, ITEMS_PER_REQUEST, offset)
+      .then(this.renderItems);
   }
 
   private handleItemsLoaded(data: QueryServerResult) {
@@ -106,17 +118,18 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
       result: data,
     });
 
-    this.renderItems(data);    
+    this.clearScene();
+    this.renderItems(data);
+
+    // center on results
+    const realBoundingBox = data.boundingBox;
+    const center = new THREE.Vector3().fromArray(data.clusters[0].center);
+    this.zoomToFit(realBoundingBox, center);
   }
 
   /** @inheritDoc */
   protected onThreeSceneCreated() {
     this.raycaster = new THREE.Raycaster();
-
-    if (this.state.result) {
-      this.renderItems(this.state.result);
-      this.startAnimating();
-    }
   }
 
   /**
@@ -130,33 +143,34 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
     this.items = [];
     this.clusters = new Map();
     this.activeCluster = null;
+    this.clusterCounter = 0;
   }
 
   /**
    * Renders given items as 3D objects on scene.
    */
   private renderItems(result: QueryServerResult) {
-    this.clearScene();
-
     if (!result || !result.clusters) {
       return;
     }
-
     DEBUG && console.log('detailGraph: render items', result);
 
     // render clusters / elements for clusters with single item
-    result.clusters.forEach((clusterItems, i) => {
-      if (clusterItems.length === 1) {
-        const item = new GraphItem(clusterItems[0]);
+    result.clusters.forEach((clusterData, i) => {
+      // remove already rendered items:
+      clusterData.items = clusterData.items.filter(item => this.getItemById(item.id, true) === null);
+
+      if (clusterData.items.length === 1) {
+        const item = new GraphItem(clusterData.items[0]);
         this.items.push(item);
   
         // create obj to render
         const {sceneObj, intersectionMesh} = item.getSceneObj();
         this.intersectionMeshes.push(intersectionMesh);
         this.scene.add(sceneObj);
-      } else {
-        const name = 'cluster_' + i;
-        const cluster = new Cluster(name, clusterItems);
+      } else if (clusterData.items.length > 1) {
+        const name = 'cluster_' + (this.clusterCounter++);
+        const cluster = new Cluster(name, clusterData);
         this.clusters.set(name, cluster);
         const {sceneObj, intersectionMesh} = cluster.getSceneObj();
         this.intersectionMeshes.push(intersectionMesh);
@@ -164,10 +178,6 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
       }
 
     });
-
-    const realBoundingBox = result.boundingBox;
-    const center = new THREE.Vector3().fromArray(result.clusters[0][0].position);
-    this.zoomToFit(realBoundingBox, center);
 
     this.startAnimating();    
   }
@@ -219,8 +229,27 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
 
     // rotate scene elements to always face camera
     const cameraPos = this.camera.position;
-    this.scene.children.forEach((mesh) => mesh.lookAt(cameraPos));
+
+    this.items.forEach(graphItem => graphItem.lookAt(cameraPos));
+    this.clusters.forEach(clusters => clusters.lookAt(cameraPos));
   }
+
+  /** @inheritDoc */
+  protected onCameraUpdate() {
+    super.onCameraUpdate();
+
+    // do not load more items if in cluster mode
+    if (this.activeCluster) {
+      return;
+    }
+
+    // TODO: improve center pos
+    const direction = this.getCameraLookAt();
+    const centerPos = this.camera.position.clone().add(direction);
+    // console.log('new center lookat pos', centerPos.toArray());
+    this.loadMoreItems(centerPos);
+  }
+
 
   /**
    * Handles click on canvas: if item is hovered, details are shown / cluster is expanded.
@@ -249,11 +278,11 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
   /**
    * Returns item info by id.
    */
-  private getItemById(id: string): DataItem {
+  private getItemById(id: string, inAllClusters = false): DataItem {
 
-    if (this.activeCluster !== null) {
+    if (!inAllClusters && this.activeCluster !== null) {
       // in cluster mode
-      return this.activeCluster.items.find(item => item.id === id);
+      return this.activeCluster.model.items.find(item => item.id === id);
     }
 
     // find in items:
@@ -263,8 +292,23 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
       }
     }
 
+    if (inAllClusters) {
+      // check if item is in cluster
+      let found: DataItem = null;
+      this.clusters.forEach((cluster) => {
+        for (let i = 0; i < cluster.model.items.length; i++) {
+          if (cluster.model.items[i].id === id) {
+            found = cluster.model.items[i];
+            break;
+          }
+        }
+      });
+      return found;
+    }
+
     return null;
   }
+
 
   /**
    * Set given cluster active. Collapses other active cluster.
@@ -345,7 +389,7 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
       if (intersectionId && intersectionId.startsWith('cluster_')) {
         const cluster = this.clusters.get(intersectionId);
         itemHover = (
-          <div>Cluster with {cluster.items.length} items.</div>
+          <div>Cluster with {cluster.model.items.length} items.</div>
         );
       } else if (intersectionId) {
         const item = this.getItemById(intersectionId);

@@ -104,4 +104,8 @@ export class GraphItem {
       // this.itemGroup.nee
     }});
   }
+
+  public lookAt(pos: THREE.Vector3) {
+    this.itemGroup.lookAt(pos);
+  }
 }

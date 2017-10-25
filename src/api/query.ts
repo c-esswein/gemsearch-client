@@ -3,7 +3,10 @@ import { serverFetch } from 'api';
 
 export type Position3D = number[];
 
-export type Cluster = DataItem[];
+export interface Cluster {
+    items: DataItem[],
+    center: Position3D,
+}
 
 export interface QueryServerResult {
     // data: DataItem[],
@@ -48,6 +51,23 @@ export function queryForItemsForGraph(query: DataItem[], typeFilter: string[], l
     
     return serverFetch('/api/query_viz?', params) as Promise<QueryServerResult>;
 }
+
+
+/**
+ * Query GEM for items including 3D viz data. 
+ */
+export function queryGraphItemsAround(vec: Position3D, typeFilter: string[], limit = 30, offset = 0) {
+    const params = {
+        'vec': vec.join(','),
+        'types': typeFilter.join('|'),
+        'minClusterDistance': 0.1,
+        'limit': limit,
+        'offset': offset
+    };
+    
+    return serverFetch('/api/items_near_viz?', params) as Promise<QueryServerResult>;
+}
+
 
 /**
  * Get suggestions of items to autocomplete term.

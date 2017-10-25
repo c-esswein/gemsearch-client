@@ -39,7 +39,6 @@ module.exports = function(env) {
     resolve: {
       // https://webpack.js.org/configuration/resolve/
       modules: [
-        //path.resolve('.'),
         path.resolve(__dirname, "src/"),
         path.resolve(__dirname, "src/styles/"),
         'node_modules',
