@@ -5,9 +5,9 @@ import { connect } from 'react-redux';
 import { StoreState, ViewModus } from 'types';
 import { setConnectDialogOpenState } from 'actions/views';
 import { SpotifyIcon, CheckIcon } from 'icons';
-import { setSpotifySyncResult } from 'actions/user';
 import * as userApi from 'api/user';
 import { LoadingIndicator } from 'components/loadingIndicator';
+import { setCurrentDbUser } from "actions/user";
 
 require('./connectDialog.scss');
 
@@ -15,7 +15,6 @@ export interface Props {
   isOpen: boolean;
   user: spotifyApi.SpotifyUser | null;  
   dbUser: userApi.DbUser | null;  
-  syncResult: userApi.SyncResult | null;
 }
 
 /**
@@ -70,8 +69,8 @@ export class ConnectDialog extends React.Component<Props, {}> {
     try {
         const {user} = this.props;
         const token = spotifyApi.getAccessToken();
-        const syncResult = await userApi.syncMusic(user.id, token);
-        this.context.dispatch(setSpotifySyncResult(syncResult));
+        const dbUser = await userApi.syncMusic(user.id, token);
+        this.context.dispatch(setCurrentDbUser(dbUser));
       } catch (error) {
         console.error(error);
         alert('Unknown error while syncing your spotify music:' + error);
@@ -79,7 +78,7 @@ export class ConnectDialog extends React.Component<Props, {}> {
   }
 
   private renderSyncStep() {
-    const { user, dbUser, syncResult } = this.props;
+    const { user, dbUser } = this.props;
     const isSpotifySyncing = user && !dbUser;
     const crawlingTimePerTrack = 1.5; // in seconds
 
@@ -229,7 +228,6 @@ export const ConnectedConnectDialog = connect(
     isOpen: views.connectDialog.isOpen,
     user: user.currentUser,
     dbUser: user.currentDbUser,
-    syncResult: user.syncResult,
   }),
 )(ConnectDialog as any);
 

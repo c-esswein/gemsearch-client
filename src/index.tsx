@@ -6,20 +6,20 @@ import { createStore, applyMiddleware, StoreEnhancer, compose } from 'redux';
 import { mainReducer } from 'reducers';
 import { StoreState, ViewModus } from 'types';
 import { Provider } from 'react-redux';
-import thunkMiddleware from 'redux-thunk';
+import createSagaMiddleware from 'redux-saga';
+import {SAGAS} from 'sagas';
 import { DispatchContextProvider } from 'components/dispatchContextProvider';
 import { AppContainer as ReactHotLoaderAppContainer } from 'react-hot-loader';
 
 require('styles/index.scss');
 require('styles/svg.scss');
-/* require('styles/react-autosuggest.scss'); // TODO scss import is not working
-require('styles/react-select.scss'); */
 require('styles/buttons.scss');
 
 function configureStore(initialState: StoreState) {
   const devToolsExtension: StoreEnhancer<any> = typeof window === 'object' && typeof window.devToolsExtension !== 'undefined' ? window.devToolsExtension() : f => f;
 
-  const enhancers = applyMiddleware(thunkMiddleware);
+  const sagaMiddleware = createSagaMiddleware();
+  const enhancers = applyMiddleware(sagaMiddleware);
   const composed = compose(enhancers, devToolsExtension);
 
   const store = createStore(
@@ -27,11 +27,16 @@ function configureStore(initialState: StoreState) {
     initialState, 
     composed
   );
+
+  // start all sagas
+  for(const saga of SAGAS){
+    sagaMiddleware.run(saga);
+  }
+
   return store;
 }
 
 const store = configureStore(undefined);
-
 
 const render = (App: React.ComponentClass<{}>) => {
   ReactDOM.render(

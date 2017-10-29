@@ -15,13 +15,11 @@ import { DispatchContext } from 'components/dispatchContextProvider';
 import { GraphIcon, ListIcon } from 'icons';
 import { ConnectedItemDetail } from 'components/itemDetail';
 import { DetailGraph } from 'components/graph/detailGraph';
-import * as spotifyApi from 'api/spotify';
-import * as userApi from 'api/user';
-import { setCurrentUser, setCurrentDbUser, setSpotifySyncResult } from 'actions/user';
 import { connect } from 'react-redux';
 import { StoreState, ViewModus } from 'types';
 import { filterItemTypes } from 'constants/itemTypes';
 import { ConnectedConnectDialog } from 'components/connectDialog';
+import { checkSpotifyAuth } from "sagas/user";
 
 export interface Props {
   queryItems: DataItem[];
@@ -43,55 +41,10 @@ export class App extends React.Component<Props, null> {
     super(props);
 
     this.handleTypeFilterClick = this.handleTypeFilterClick.bind(this);
-    this.handleSpotifyUserLoaded = this.handleSpotifyUserLoaded.bind(this);
   }
 
   componentDidMount(): void {
-    this.checkSpotifyAuth(); 
-  }
-
-  /**
-   * Check if access token is set or contained in url. If so, load spotify user
-   * and check current state of user in own db.
-   */
-  private checkSpotifyAuth() {
-    if (spotifyApi.checkUrlForAuth() || spotifyApi.getAccessToken()) {
-      try {
-        spotifyApi.getUserInfo().then(this.handleSpotifyUserLoaded);
-      } catch (ex) {
-        console.error(ex);
-        alert('spotify auth error');
-      }
-      
-    }
-  }
-
-  /**
-   * Handles successful login with spotify account. (initial or relogin)
-   */
-  private async handleSpotifyUserLoaded(user: spotifyApi.SpotifyUser) {
-    // set user state
-    this.context.dispatch(setCurrentUser(user));
-    
-    // check api for known user
-    const dbUser = await userApi.checkUser(user.id);
-    this.context.dispatch(setCurrentDbUser(dbUser));
-    
-    if (dbUser === null) {
-      // new user --> start syncing music
-      try {
-        // open connect dialog to show status
-        this.context.dispatch(viewActions.setConnectDialogOpenState(true));
-        
-        const token = spotifyApi.getAccessToken();
-        const syncResult = await userApi.syncMusic(user.id, token);
-        this.context.dispatch(setSpotifySyncResult(syncResult));
-      } catch (error) {
-        console.error(error);
-        alert('Unknown error while syncing your spotify music:' + error);
-      }
-
-    }
+    this.context.dispatch(checkSpotifyAuth());
   }
 
   private handleViewChangeClick(viewState: ViewModus) {

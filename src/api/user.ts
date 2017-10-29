@@ -16,8 +16,7 @@ export interface DbUser {
  * Checks if given user is known in system. Returnes DbUser obj or 
  * null if user is not in DB.
  */
-export function checkUser(username: string): Promise<DbUser | null> {
-    const hashedUsername = hashUserName(username);
+export function checkUser(hashedUsername: string): Promise<DbUser | null> {
     return serverFetch('/api/user/check/'+hashedUsername).
         then(processServerResp).
         then(response => response.data);
@@ -29,14 +28,10 @@ export function hashUserName(username: string): string {
 }
 
 
-export interface SyncResult {
-    syncedTracks: number,
-}
-
 /**
  * Sync spotify music lib with server.
  */
-export function syncMusic(userName: string, token: string): Promise<DbUser & SyncResult> {
+export function syncMusic(userName: string, token: string): Promise<DbUser> {
     const hashedUsername = hashUserName(userName);    
     return serverPost('/api/user/sync', undefined, {
         userName: hashedUsername,

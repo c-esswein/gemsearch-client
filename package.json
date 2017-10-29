@@ -66,6 +66,7 @@
     "react-select": "^1.0.0-rc.3",
     "react-transition-group": "1.x",
     "redux": "^3.7.0",
+    "redux-saga": "^0.16.0",
     "redux-thunk": "^2.1.0",
     "spotify-web-api-js": "^0.22.0",
     "style-loader": "^0.18.2",

@@ -1,12 +1,11 @@
 
 import { SpotifyUser } from 'api/spotify';
-import { DbUser, SyncResult } from 'api/user';
+import { DbUser } from 'api/user';
 
 export type Actions = 
     & SetCurrentUserAction 
     | ClearCurrentUserAction 
-    | SetCurrentDbUserAction 
-    | SetSpotifySyncResultAction;
+    | SetCurrentDbUserAction;
 
 
 export interface SetCurrentUserAction {
@@ -28,17 +27,6 @@ export function setCurrentDbUser(currentUser: DbUser): SetCurrentDbUserAction {
     return {
         type: 'SET_CURRENT_DB_USER',
         currentUser
-    };
-}
-
-export interface SetSpotifySyncResultAction {
-    type: 'SET_SPOTIFY_SYNC_RESULT';
-    result: DbUser & SyncResult;
-}
-export function setSpotifySyncResult(result: DbUser & SyncResult): SetSpotifySyncResultAction {
-    return {
-        type: 'SET_SPOTIFY_SYNC_RESULT',
-        result
     };
 }
 

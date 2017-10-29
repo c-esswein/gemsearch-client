@@ -1,18 +1,30 @@
 import { Actions } from 'actions';
 import { SpotifyUser } from 'api/spotify';
-import { DbUser, SyncResult } from 'api/user';
+import { DbUser } from 'api/user';
 
 export interface UserState {
     currentUser: SpotifyUser | null,
     currentDbUser: DbUser | null,
-    syncResult: SyncResult,
 }
 
 const initialState: UserState = {
     currentUser: null,
     currentDbUser: null,
-    syncResult: null,
 };
+
+/**
+ * Returns true if user is contained in embedding and can be used for query.
+ */
+export function isUserEmbedded(user: DbUser) {
+  return user && user.userStatus === 'EMBEDDED' || user.userStatus === 'PARTIAL_EMBEDDED';
+}
+
+/**
+ * Returns true if user is fully embedded (no ongoing sync).
+ */
+export function isUserFullyEmbedded(user: DbUser) {
+  return user && user.userStatus === 'EMBEDDED';
+}
 
 export function userReducer(state: UserState = initialState, action: Actions): UserState {
   switch (action.type) {
@@ -25,12 +37,6 @@ export function userReducer(state: UserState = initialState, action: Actions): U
       return { 
         ...state, 
         currentDbUser: action.currentUser
-      };
-    case 'SET_SPOTIFY_SYNC_RESULT':
-      return { 
-        ...state, 
-        syncResult: {syncedTracks: action.result.syncedTracks},
-        currentDbUser: action.result
       };
     case 'CLEAR_CURRENT_USER':
       return {

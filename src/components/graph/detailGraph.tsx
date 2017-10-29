@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as THREE from 'three';
 import { DataItem, ItemType, StoreState } from 'types';
 import { DispatchContext } from 'components/dispatchContextProvider';
-import { xFetch, throttle } from 'utils';
+import { xFetch } from 'utils';
 import { TypeColors } from 'constants/colors';
 import { ThreeScene } from 'components/graph/threeScene';
 import { State as ThreeSceneState } from 'components/graph/threeScene';
@@ -12,6 +12,8 @@ import { GraphItem } from 'components/graph/graphItem';
 import { QueryServerResult, queryForItemsForGraph, queryGraphItemsAround } from 'api/query';
 import { Cluster } from 'components/graph/cluster';
 import { RemoveIcon } from 'icons';
+import { ApiThrottle } from 'utils/apiThrottle';
+import { CancelablePromise } from 'utils/cancelablePromise';
 
 require('./graph.scss');
 
@@ -42,6 +44,8 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
   private activeCluster: Cluster;
   private raycaster: THREE.Raycaster;
   private intersectionMeshes: THREE.Object3D[];
+  private throttleApi = new ApiThrottle<QueryServerResult>();
+  private queryPromise: CancelablePromise<QueryServerResult>;
 
   /** Mouse position before cluster was expanded */
   private cameraPosBeforeCluster: THREE.Vector3;
@@ -70,7 +74,6 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
 
     this.handleCanvasClick = this.handleCanvasClick.bind(this);
     this.handleItemsLoaded = this.handleItemsLoaded.bind(this);
-    this.loadMoreItems = throttle(this.loadMoreItems.bind(this), 200, {leading: false, trailing: false});
     this.renderItems = this.renderItems.bind(this);
   }
 
@@ -88,6 +91,22 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
     }
   }
 
+  componentWillUnmount() {
+    super.componentWillUnmount();
+
+    this.throttleApi.dispose();
+    if (this.queryPromise) {
+      this.queryPromise.cancel();
+      this.queryPromise = null;
+    }
+  }
+
+
+  /** @inheritDoc */
+  protected onThreeSceneCreated() {
+    this.raycaster = new THREE.Raycaster();
+  }
+
   /**
    * Query api for items.
    */
@@ -99,17 +118,25 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
       isLoading: true,
     });
 
-    // TODO: use cancleable promise
-    queryForItemsForGraph(queryItems, typeFilter, ITEMS_PER_REQUEST, offset)
-      .then(this.handleItemsLoaded);
+    // cancel previous request
+    if (this.queryPromise) {
+      this.queryPromise.cancel();
+    }
+
+    this.queryPromise = new CancelablePromise(queryForItemsForGraph(queryItems, typeFilter, ITEMS_PER_REQUEST, offset));
+    this.queryPromise.then(this.handleItemsLoaded);
   }
 
+  /**
+   * Queries for more items around vec.
+   */
   private loadMoreItems(vec: THREE.Vector3) {
     const {typeFilter} = this.props;
     const offset = 0;
 
-    queryGraphItemsAround(vec.toArray(), typeFilter, ITEMS_PER_REQUEST, offset)
-      .then(this.renderItems);
+    this.throttleApi.fetch(() => {
+      return queryGraphItemsAround(vec.toArray(), typeFilter, ITEMS_PER_REQUEST, offset);
+    }, this.renderItems);
   }
 
   private handleItemsLoaded(data: QueryServerResult) {
@@ -127,10 +154,6 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
     this.zoomToFit(realBoundingBox, center);
   }
 
-  /** @inheritDoc */
-  protected onThreeSceneCreated() {
-    this.raycaster = new THREE.Raycaster();
-  }
 
   /**
    * Clears all elements of current scene.
@@ -326,6 +349,8 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
 
     nextCluster.expand();
     this.activeCluster = nextCluster;
+    // make sure all elements are rotated correctly
+    this.clusters.forEach(clusters => clusters.lookAt(this.camera.position));    
 
     // hide all elements and scale positions
     this.items.forEach(item => {
@@ -395,15 +420,16 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
         const item = this.getItemById(intersectionId);
         if (!item) {
           console.error('Precondition violation: Intersection item not found');
+        } else {
+          itemHover = (
+            <div>
+              <div className="detailGraph__item-hover-name">{item.name}</div>
+              {item.meta && item.meta.artist ?
+                <div className="detailGraph__item-hover-artist">{item.meta.artist}</div>
+              : null}
+            </div>
+          );
         }
-        itemHover = (
-          <div>
-            <div className="detailGraph__item-hover-name">{item.name}</div>
-            {item.meta && item.meta.artist ?
-              <div className="detailGraph__item-hover-artist">{item.meta.artist}</div>
-            : null}
-          </div>
-        );
       }
     } catch (ex) {
       console.error('Wrong intersection info', ex);
