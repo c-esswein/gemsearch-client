@@ -5,7 +5,8 @@ import { DbUser } from 'api/user';
 export type Actions = 
     & SetCurrentUserAction 
     | ClearCurrentUserAction 
-    | SetCurrentDbUserAction;
+    | SetCurrentDbUserAction
+    | SetUseUserAsContextAction;
 
 
 export interface SetCurrentUserAction {
@@ -36,5 +37,16 @@ export interface ClearCurrentUserAction {
 export function clearCurrentUser(): ClearCurrentUserAction {
     return {
         type: 'CLEAR_CURRENT_USER',
+    };
+}
+
+export interface SetUseUserAsContextAction {
+    type: 'SET_USE_USER_AS_CONTEXT';
+    useUserAsContext: boolean,
+}
+export function setUseUserAsContext(useUserAsContext: boolean): SetUseUserAsContextAction {
+    return {
+        type: 'SET_USE_USER_AS_CONTEXT',
+        useUserAsContext
     };
 }

@@ -5,6 +5,10 @@ import { DataItem } from 'types';
 import * as queryActions from 'actions/query';
 import { queryForItems } from 'api/query';
 import { LoadingIndicator } from 'components/loadingIndicator';
+import { CancelablePromise } from 'utils/cancelablePromise';
+import { isUserEmbedded } from 'reducers/user';
+import { DbUser } from 'api/user';
+import * as deepEqual from 'deep-equal';
 
 require('./resultList.scss');
 
@@ -13,6 +17,8 @@ const ITEMS_PER_REQUEST = 30;
 interface Props {
   queryItems: DataItem[];
   typeFilter: string[];
+  useUserAsContext: boolean;
+  user: DbUser;
 }
 
 interface State {
@@ -20,9 +26,13 @@ interface State {
   resultItems: DataItem[],
 }
 
+/**
+ * List view for query result.
+ */
 export class ResultList extends React.Component<Props, State> {
 
   private page = -1;
+  private loadingPromise: CancelablePromise<DataItem[]> = null;
 
   constructor(props: Props) {
     super(props);
@@ -36,15 +46,25 @@ export class ResultList extends React.Component<Props, State> {
   }
   
   componentWillMount(): void {
-    this.queryForItems(this.props.queryItems, this.props.typeFilter);    
+    const { queryItems, typeFilter, user, useUserAsContext } = this.props;
+    this.queryForItems(queryItems, typeFilter, user, useUserAsContext);
   }
 
   componentWillReceiveProps(nextProps: Props) {
     if (nextProps.queryItems !== this.props.queryItems ||
-      nextProps.typeFilter !== this.props.typeFilter) {
+      nextProps.typeFilter !== this.props.typeFilter ||
+      !deepEqual(nextProps.user, this.props.user) ||
+      nextProps.useUserAsContext !== this.props.useUserAsContext) {
       
         this.page = -1;
-        this.queryForItems(nextProps.queryItems, nextProps.typeFilter);
+        this.queryForItems(nextProps.queryItems, nextProps.typeFilter, nextProps.user, nextProps.useUserAsContext);
+    }
+  }
+
+  componentWillUnmount(): void {
+    if (this.loadingPromise) {
+      this.loadingPromise.cancel();
+      this.loadingPromise = null;
     }
   }
 
@@ -52,7 +72,7 @@ export class ResultList extends React.Component<Props, State> {
   /**
    * Query api for items.
    */
-  private queryForItems(queryItems: DataItem[], typeFilter: string[]) {
+  private queryForItems(queryItems: DataItem[], typeFilter: string[], user: DbUser, useUserAsContext: boolean) {
     this.page++;
     const offset = ITEMS_PER_REQUEST * this.page;
 
@@ -60,31 +80,41 @@ export class ResultList extends React.Component<Props, State> {
       isLoading: true,
     });
 
-    queryForItems(queryItems, typeFilter, ITEMS_PER_REQUEST, offset)
-      .then(data => {
-        if (offset > 0) {
-          // append items
-          this.setState({
-            isLoading: false,
-            resultItems: [
-              ...this.state.resultItems,
-              ...data
-            ],
-          });
+    // cancel previous call
+    if (this.loadingPromise) {
+      this.loadingPromise.cancel();
+    }
 
-        } else {
-          this.setState({
-            isLoading: false,
-            resultItems: data,
-          });
-        }
-      });
+    let queryUser: DbUser = null;
+    if (useUserAsContext && isUserEmbedded(user)) {
+      queryUser = user;
+    }
+
+    this.loadingPromise = new CancelablePromise(queryForItems(queryItems, typeFilter, ITEMS_PER_REQUEST, offset, queryUser));
+    this.loadingPromise.then(data => {
+      if (offset > 0) {
+        // append items
+        this.setState({
+          isLoading: false,
+          resultItems: [
+            ...this.state.resultItems,
+            ...data
+          ],
+        });
+
+      } else {
+        this.setState({
+          isLoading: false,
+          resultItems: data,
+        });
+      }
+    });
   }
 
 
   private handleLoadMoreClick() {
-    const {queryItems, typeFilter} = this.props;
-    this.queryForItems(queryItems, typeFilter);
+    const {queryItems, typeFilter, user, useUserAsContext} = this.props;
+    this.queryForItems(queryItems, typeFilter, user, useUserAsContext);
   }
 
 

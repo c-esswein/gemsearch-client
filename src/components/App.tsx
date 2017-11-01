@@ -12,19 +12,25 @@ import { DataItem } from 'types';
 import * as queryActions from 'actions/query';
 import * as viewActions from 'actions/views';
 import { DispatchContext } from 'components/dispatchContextProvider';
-import { GraphIcon, ListIcon } from 'icons';
+import { GraphIcon, ListIcon, HeartIcon } from 'icons';
 import { ConnectedItemDetail } from 'components/itemDetail';
 import { DetailGraph } from 'components/graph/detailGraph';
 import { connect } from 'react-redux';
 import { StoreState, ViewModus } from 'types';
 import { filterItemTypes } from 'constants/itemTypes';
 import { ConnectedConnectDialog } from 'components/connectDialog';
-import { checkSpotifyAuth } from "sagas/user";
+import { checkSpotifyAuth } from 'sagas/user';
+import { DbUser } from 'api/user';
+import { RecommendationList } from 'components/recommendationList';
+import { isUserEmbedded } from 'reducers/user';
 
 export interface Props {
   queryItems: DataItem[];
   typeFilter: string[];
   viewModus: ViewModus;
+
+  useUserAsContext: boolean,
+  user: DbUser,
 }
 
 /**
@@ -57,23 +63,20 @@ export class App extends React.Component<Props, null> {
     this.context.dispatch(filterAction);
   }
 
-  private renderViewLink(title: string, state: ViewModus) {
+  private renderViewLink(title: string, state: ViewModus, icon: JSX.Element) {
     return (
       <span 
         className={'app__view-link ' + (this.props.viewModus === state ? 'app__view-link--active' : '')}
         title={'Show results as ' + title}
         onClick={this.handleViewChangeClick.bind(this, state)}>
-        {state === ViewModus.GRAPH ? 
-            <GraphIcon /> :
-            <ListIcon />
-        }
+        {icon}
         <span>{title}</span>
       </span>
     );
   }
 
   private renderMainView(hasQueryItems: boolean) {
-    const {viewModus, queryItems, typeFilter} = this.props;
+    const {viewModus, queryItems, typeFilter, useUserAsContext, user} = this.props;
 
     if (!hasQueryItems) {
       return (
@@ -81,21 +84,28 @@ export class App extends React.Component<Props, null> {
       );
     }
 
-    if (viewModus === ViewModus.LIST) {
-      return (
-        <ResultList queryItems={queryItems} typeFilter={typeFilter} />
-      );
-    } else {
-      return (
-        <DetailGraph queryItems={queryItems} typeFilter={typeFilter} />
-        // <Graph items={props.resultItems} />
-      );        
+    switch (viewModus) {
+      case ViewModus.GRAPH:
+        return (
+          <DetailGraph queryItems={queryItems} typeFilter={typeFilter} useUserAsContext={useUserAsContext} user={user} />
+          // <Graph items={props.resultItems} />
+        );
+      case ViewModus.RECOMMENDATIONS:
+        return (
+          <RecommendationList typeFilter={typeFilter} user={user} />
+        );
+    
+      default:
+        return (
+          <ResultList queryItems={queryItems} typeFilter={typeFilter} useUserAsContext={useUserAsContext} user={user} />
+        );
     }
   }
 
   render() {
-    const {queryItems, typeFilter} = this.props;
+    const { queryItems, typeFilter, user} = this.props;
     const hasQueryItems = (queryItems && queryItems.length > 0);
+    const canShowRecommendations = isUserEmbedded(user);
 
     return (
       <div className="app">
@@ -117,8 +127,9 @@ export class App extends React.Component<Props, null> {
             </div>
 
             <div className="app__view-links">
-              {this.renderViewLink('List', ViewModus.LIST)}
-              {this.renderViewLink('Graph', ViewModus.GRAPH)}
+              {canShowRecommendations ? this.renderViewLink('Recommended for you', ViewModus.RECOMMENDATIONS, <HeartIcon />) : null}
+              {this.renderViewLink('List', ViewModus.LIST, <ListIcon />)}
+              {this.renderViewLink('Graph', ViewModus.GRAPH, <GraphIcon />)}
             </div>
           </div>
           : null 
@@ -147,6 +158,8 @@ export const ConnectedApp = connect(
     queryItems: query.queryItems,
     typeFilter: query.typeFilter,
     viewModus: views.app.viewModus,
+    useUserAsContext: user.useUserAsContext,
+    user: user.currentDbUser,
   }),
 )(App as any);
 

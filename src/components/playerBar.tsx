@@ -100,6 +100,9 @@ export class PlayerBar extends React.Component<Props, null> {
           }
           <div className="playerBar__meta">
             <div className="playerBar__meta-name">{track.name}</div>
+            {track.meta && track.meta.artist ?
+              <div className="playerBar__meta-artist">{track.meta.artist}</div>
+              : null}
           </div>
 
       </div>

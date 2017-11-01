@@ -14,12 +14,17 @@ import { Cluster } from 'components/graph/cluster';
 import { RemoveIcon } from 'icons';
 import { ApiThrottle } from 'utils/apiThrottle';
 import { CancelablePromise } from 'utils/cancelablePromise';
+import { DbUser } from 'api/user';
+import * as deepEqual from 'deep-equal';
+import { isUserEmbedded } from 'reducers/user';
 
 require('./graph.scss');
 
 interface Props {
   queryItems: DataItem[];
   typeFilter: string[];
+  useUserAsContext: boolean;
+  user: DbUser;
 }
 
 interface State {
@@ -79,15 +84,18 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
 
   componentWillMount(): void {
     // query for initial items
-    this.queryForItems(this.props.queryItems, this.props.typeFilter);
+    const { queryItems, typeFilter, user, useUserAsContext } = this.props;
+    this.queryForItems(queryItems, typeFilter, user, useUserAsContext);
   }
 
   componentWillReceiveProps(nextProps: Props) {
     if (nextProps.queryItems !== this.props.queryItems ||
+      !deepEqual(nextProps.user, this.props.user) ||
+      nextProps.useUserAsContext !== this.props.useUserAsContext ||
       nextProps.typeFilter !== this.props.typeFilter) {
         // query from query bar has changed
         this.page = -1;
-        this.queryForItems(nextProps.queryItems, nextProps.typeFilter);
+        this.queryForItems(nextProps.queryItems, nextProps.typeFilter, nextProps.user, nextProps.useUserAsContext);
     }
   }
 
@@ -110,7 +118,7 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
   /**
    * Query api for items.
    */
-  private queryForItems(queryItems: DataItem[], typeFilter: string[]) {
+  private queryForItems(queryItems: DataItem[], typeFilter: string[], user: DbUser, useUserAsContext: boolean) {
     this.page++;
     const offset = ITEMS_PER_REQUEST * this.page;
 
@@ -123,7 +131,12 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
       this.queryPromise.cancel();
     }
 
-    this.queryPromise = new CancelablePromise(queryForItemsForGraph(queryItems, typeFilter, ITEMS_PER_REQUEST, offset));
+    let queryUser: DbUser = null;
+    if (useUserAsContext && isUserEmbedded(user)) {
+      queryUser = user;
+    }
+
+    this.queryPromise = new CancelablePromise(queryForItemsForGraph(queryItems, typeFilter, ITEMS_PER_REQUEST, offset, queryUser));
     this.queryPromise.then(this.handleItemsLoaded);
   }
 
@@ -131,11 +144,17 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
    * Queries for more items around vec.
    */
   private loadMoreItems(vec: THREE.Vector3) {
-    const {typeFilter} = this.props;
+    const { typeFilter, user, useUserAsContext} = this.props;
     const offset = 0;
 
+
+    let queryUser: DbUser = null;
+    if (useUserAsContext && isUserEmbedded(user)) {
+      queryUser = user;
+    }
+
     this.throttleApi.fetch(() => {
-      return queryGraphItemsAround(vec.toArray(), typeFilter, ITEMS_PER_REQUEST, offset);
+      return queryGraphItemsAround(vec.toArray(), typeFilter, ITEMS_PER_REQUEST, offset, queryUser);
     }, this.renderItems);
   }
 

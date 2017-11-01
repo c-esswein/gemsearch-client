@@ -5,7 +5,7 @@ import { PlayerState } from 'reducers/player';
 import { UserState } from 'reducers/user';
 
 export enum ViewModus {
-    LIST, GRAPH
+    LIST, GRAPH, RECOMMENDATIONS
 }
 
 export interface StoreState {
@@ -48,6 +48,7 @@ export interface Track extends DataItem {
         uri: string,
         images: ImageData[]
         preview_url: string,
+        artist?: string,        
     }
 }
 

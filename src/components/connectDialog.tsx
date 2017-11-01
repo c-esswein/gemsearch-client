@@ -7,7 +7,8 @@ import { setConnectDialogOpenState } from 'actions/views';
 import { SpotifyIcon, CheckIcon } from 'icons';
 import * as userApi from 'api/user';
 import { LoadingIndicator } from 'components/loadingIndicator';
-import { setCurrentDbUser } from "actions/user";
+import { setCurrentDbUser, setUseUserAsContext } from 'actions/user';
+import { isUserEmbedded } from 'reducers/user';
 
 require('./connectDialog.scss');
 
@@ -15,6 +16,7 @@ export interface Props {
   isOpen: boolean;
   user: spotifyApi.SpotifyUser | null;  
   dbUser: userApi.DbUser | null;  
+  useUserAsContext: boolean,
 }
 
 /**
@@ -34,6 +36,7 @@ export class ConnectDialog extends React.Component<Props, {}> {
     this.handleDocumentClick = this.handleDocumentClick.bind(this);
     this.handleLoginClick = this.handleLoginClick.bind(this);
     this.handleSyncClick = this.handleSyncClick.bind(this);
+    this.handleToggleUserContext = this.handleToggleUserContext.bind(this);
   }
 
   public componentDidMount() {
@@ -157,8 +160,8 @@ export class ConnectDialog extends React.Component<Props, {}> {
   }
 
   private renderEnjoy() {
-    const { dbUser } = this.props;
-    const ready = dbUser && (dbUser.userStatus === 'EMBEDDED' || dbUser.userStatus === 'PARTIAL_EMBEDDED');
+    const { dbUser, useUserAsContext } = this.props;
+    const ready = isUserEmbedded(dbUser);
 
     if (ready) {
         return (
@@ -167,6 +170,9 @@ export class ConnectDialog extends React.Component<Props, {}> {
                 <p>
                     <CheckIcon />
                     Start using your personalized results! :)
+                </p>
+                <p>
+                    <div className="btn-raised" onClick={this.handleToggleUserContext}>{useUserAsContext ? 'use user context (disable)' : 'no user context (enable)'}</div>
                 </p>
             </div>
         );
@@ -182,6 +188,11 @@ export class ConnectDialog extends React.Component<Props, {}> {
         );
     }
 
+  }
+
+  private handleToggleUserContext() {
+      const { useUserAsContext } = this.props;      
+      this.context.dispatch(setUseUserAsContext(!useUserAsContext));
   }
 
   render() {
@@ -228,6 +239,7 @@ export const ConnectedConnectDialog = connect(
     isOpen: views.connectDialog.isOpen,
     user: user.currentUser,
     dbUser: user.currentDbUser,
+    useUserAsContext: user.useUserAsContext,
   }),
 )(ConnectDialog as any);
 

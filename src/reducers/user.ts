@@ -5,18 +5,20 @@ import { DbUser } from 'api/user';
 export interface UserState {
     currentUser: SpotifyUser | null,
     currentDbUser: DbUser | null,
+    useUserAsContext: boolean,
 }
 
 const initialState: UserState = {
     currentUser: null,
     currentDbUser: null,
+    useUserAsContext: true,
 };
 
 /**
  * Returns true if user is contained in embedding and can be used for query.
  */
 export function isUserEmbedded(user: DbUser) {
-  return user && user.userStatus === 'EMBEDDED' || user.userStatus === 'PARTIAL_EMBEDDED';
+  return user && (user.userStatus === 'EMBEDDED' || user.userStatus === 'PARTIAL_EMBEDDED');
 }
 
 /**
@@ -25,6 +27,7 @@ export function isUserEmbedded(user: DbUser) {
 export function isUserFullyEmbedded(user: DbUser) {
   return user && user.userStatus === 'EMBEDDED';
 }
+
 
 export function userReducer(state: UserState = initialState, action: Actions): UserState {
   switch (action.type) {
@@ -42,6 +45,11 @@ export function userReducer(state: UserState = initialState, action: Actions): U
       return {
         ...state,
         currentUser: null
+      };
+    case 'SET_USE_USER_AS_CONTEXT':
+      return {
+        ...state,
+        useUserAsContext: action.useUserAsContext
       };
     default:
       return state;
