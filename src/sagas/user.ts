@@ -3,7 +3,7 @@ import * as userApi from 'api/user';
 import { setCurrentUser, setCurrentDbUser, SetCurrentDbUserAction } from 'actions/user';
 import * as viewActions from 'actions/views';
 import { takeEvery, call, put } from 'redux-saga/effects';
-import { delay } from "utils";
+import { delay } from 'utils';
 
 export const SAGAS = [
     watchSpotifyAuthCheck,
@@ -33,13 +33,23 @@ export function* watchSetDbUser() {
  * and check current state of user in own db.
  */
 function* handleCheckSpotifyAuth() {
-    if (spotifyApi.checkUrlForAuth() || spotifyApi.getAccessToken()) {
+    // check if url contains oatuch tokens
+    if (spotifyApi.checkUrlForAuth()) {
         try {
             const user = yield call(spotifyApi.getUserInfo);
             yield call(handleSpotifyUserLoaded, user);
         } catch (ex) {
             console.error(ex);
             alert('spotify auth error');
+        }
+    } 
+    // check if local storage contains token
+    else if (spotifyApi.getAccessToken()) {
+        try {
+            const user = yield call(spotifyApi.getUserInfo);
+            yield call(handleSpotifyUserLoaded, user);
+        } catch (ex) {
+            console.error(ex);
         }
     }
 }
