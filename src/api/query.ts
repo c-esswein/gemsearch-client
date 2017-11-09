@@ -50,7 +50,7 @@ export function queryForItemsForGraph(query: DataItem[], typeFilter: string[], l
     const params = {
         'ids': queryIds.join('|'),
         'types': typeFilter.join('|'),
-        'minClusterDistance': 0.1,
+        'minClusterDistance': 0.01,
         'limit': limit,
         'offset': offset,
         'user': dbUser ? dbUser.userName : undefined,

@@ -297,9 +297,9 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
     }
 
     // get camera center and load more items there
-    const direction = this.getCameraLookAt();
-    const centerPos = this.camera.position.clone().add(direction);
+    const centerPos = this.getCameraLookAt();
     centerPos.multiplyScalar(1 / LAYOUT_CONFIG.scalingFac);
+    console.log(centerPos);
     this.loadMoreItems(centerPos);
   }
 

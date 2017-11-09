@@ -12,7 +12,7 @@ export interface State {
 }
 
 const DEBUG = true;
-const CHANGE_THRESHOLD = 10;
+const CHANGE_THRESHOLD = 20;
 
 /**
  * Base class for creating three js scenes.
@@ -65,6 +65,9 @@ export class ThreeScene<T, M extends State> extends React.Component<T, M> {
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
     this.camera.position.y = 150;
     this.camera.position.z = 350;
+
+    const helper = new THREE.CameraHelper(this.camera);
+    this.scene.add(helper);
     
     this.controls = new TrackballControls(this.camera, this.renderContainer);
     this.controls.addEventListener('change', this.handleControlUpdate);
@@ -254,13 +257,11 @@ export class ThreeScene<T, M extends State> extends React.Component<T, M> {
    * Returns pointer where camera focuses on.
    */
   public getCameraLookAt() {
-    const lookAtVector = new THREE.Vector3(0, 0, -1);
-    lookAtVector.applyQuaternion(this.camera.quaternion);
-    lookAtVector.normalize().multiplyScalar(this.currentCameraDistance);
+    const center = (new THREE.Vector3(0, 0, 1)).unproject(this.camera); // far target
+    // TODO: may improve calculation but you know, never change a running system :)
+    const direction = center.clone().sub(this.camera.position).normalize().multiplyScalar(this.currentCameraDistance).add(this.camera.position);
 
-    const center = lookAtVector.add(this.camera.position);
-
-    return center;
+    return direction;
   }
 
   /**
