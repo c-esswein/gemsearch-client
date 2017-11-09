@@ -17,6 +17,7 @@ import { CancelablePromise } from 'utils/cancelablePromise';
 import { DbUser } from 'api/user';
 import * as deepEqual from 'deep-equal';
 import { isUserEmbedded } from 'reducers/user';
+import { LAYOUT_CONFIG } from 'components/graph';
 
 require('./graph.scss');
 
@@ -78,7 +79,7 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
     };
 
     this.handleCanvasClick = this.handleCanvasClick.bind(this);
-    this.handleItemsLoaded = this.handleItemsLoaded.bind(this);
+    this.handleInitialItemsLoaded = this.handleInitialItemsLoaded.bind(this);
     this.renderItems = this.renderItems.bind(this);
   }
 
@@ -137,7 +138,7 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
     }
 
     this.queryPromise = new CancelablePromise(queryForItemsForGraph(queryItems, typeFilter, ITEMS_PER_REQUEST, offset, queryUser));
-    this.queryPromise.then(this.handleItemsLoaded);
+    this.queryPromise.then(this.handleInitialItemsLoaded);
   }
 
   /**
@@ -146,7 +147,6 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
   private loadMoreItems(vec: THREE.Vector3) {
     const { typeFilter, user, useUserAsContext} = this.props;
     const offset = 0;
-
 
     let queryUser: DbUser = null;
     if (useUserAsContext && isUserEmbedded(user)) {
@@ -158,7 +158,11 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
     }, this.renderItems);
   }
 
-  private handleItemsLoaded(data: QueryServerResult) {
+  /**
+   * Handles api response for first query items.
+   * Result is rendered and camera centered to fit result.
+   */
+  private handleInitialItemsLoaded(data: QueryServerResult) {
     this.setState({
       isLoading: false,
       result: data,
@@ -192,10 +196,17 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
    * Renders given items as 3D objects on scene.
    */
   private renderItems(result: QueryServerResult) {
+    DEBUG && console.log('detailGraph: render items', result);
     if (!result || !result.clusters) {
+      DEBUG && console.error('detailGraph: Empty server response', result);
       return;
     }
-    DEBUG && console.log('detailGraph: render items', result);
+
+    // do not render additional items when in cluster mode, would be nice, but positions and states
+    // would have to be set --> could be improved!
+    if (this.activeCluster) {
+      return;
+    }
 
     // render clusters / elements for clusters with single item
     result.clusters.forEach((clusterData, i) => {
@@ -285,10 +296,10 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
       return;
     }
 
-    // TODO: improve center pos
+    // get camera center and load more items there
     const direction = this.getCameraLookAt();
     const centerPos = this.camera.position.clone().add(direction);
-    // console.log('new center lookat pos', centerPos.toArray());
+    centerPos.multiplyScalar(1 / LAYOUT_CONFIG.scalingFac);
     this.loadMoreItems(centerPos);
   }
 

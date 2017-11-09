@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as actions from 'actions';
 
 import { Track } from 'types';
-import { PlayIcon, PauseIcon } from 'icons';
+import { PlayIcon, PauseIcon, WarningIcon } from 'icons';
 import { DispatchContext } from 'components/dispatchContextProvider';
 import { AuthControl } from 'components/authControl';
 import * as playerActions from 'actions/player';
@@ -94,8 +94,8 @@ export class PlayerBar extends React.Component<Props, null> {
               }
             </div>
           :
-            <div className="playerBar__control">
-              <PlayIcon className="playerBar__control-play-icon" />
+            <div className="playerBar__control" title="No preview available">
+              <WarningIcon className="playerBar__control-warning-icon" />
             </div>
           }
           <div className="playerBar__meta">

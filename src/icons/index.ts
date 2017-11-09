@@ -10,3 +10,4 @@ export * from 'icons/options';
 export * from 'icons/spotify';
 export * from 'icons/check';
 export * from 'icons/heart';
+export * from 'icons/warning';

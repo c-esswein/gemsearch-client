@@ -29,6 +29,7 @@ export class ThreeScene<T, M extends State> extends React.Component<T, M> {
   /** max mouse move distance between mouse down-up to dispatch click event */
   private clickMoveThreshold = 5;
 
+  private currentCameraDistance = 1;
   private sceneCameraPos: THREE.Vector3 = new THREE.Vector3();
   
   private shouldAnimate: boolean = false;
@@ -108,12 +109,6 @@ export class ThreeScene<T, M extends State> extends React.Component<T, M> {
     this.mouse.y = - (clientY / height) * 2 + 1;
   }
 
-
-  public getCameraLookAt() {
-    const lookAtVector = new THREE.Vector3(0, 0, -1);
-    lookAtVector.applyQuaternion(this.camera.quaternion);
-    return lookAtVector;
-  }
 
   /**
    * Custom click detection to distinguish drag from click behavior.
@@ -240,15 +235,32 @@ export class ThreeScene<T, M extends State> extends React.Component<T, M> {
     maxDim *= LAYOUT_CONFIG.scalingFac;
     maxDim *= 1.1;
 
+    // TODO: scale position by scalingFac?
+
     const distance = maxDim / 2 / aspect / fov;
     // TODO: other camera position?
     const cameraPosition = center.clone();
     cameraPosition.z = distance;
+
+    this.currentCameraDistance = distance;
     
     this.camera.position.copy(cameraPosition);
     this.camera.lookAt(center);
     this.sceneCameraPos = center.clone();    
     DEBUG && console.log('threeScene: new camera position', this.camera.position);
+  }
+
+  /**
+   * Returns pointer where camera focuses on.
+   */
+  public getCameraLookAt() {
+    const lookAtVector = new THREE.Vector3(0, 0, -1);
+    lookAtVector.applyQuaternion(this.camera.quaternion);
+    lookAtVector.normalize().multiplyScalar(this.currentCameraDistance);
+
+    const center = lookAtVector.add(this.camera.position);
+
+    return center;
   }
 
   /**

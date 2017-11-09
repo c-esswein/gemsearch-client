@@ -30,7 +30,7 @@ export class ApiThrottle<T> {
         this.fetch_(fetchGenerator, handleLoaded);
     }
 
-    private handleFetchLoaded() {
+    private handleFetchLoaded(apiResult: T): T {
         this.pendingCall = null;
 
         if (this.nextCall !== null) {
@@ -38,6 +38,8 @@ export class ApiThrottle<T> {
             this.nextCall = null; 
             this.nextHandleLoaded = null; 
         }
+
+        return apiResult;
     }
 
     /**
