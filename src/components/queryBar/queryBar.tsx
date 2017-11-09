@@ -20,6 +20,7 @@ interface State {
   textInput: string,
   suggestItems: SuggestionItem[];
   isFocused: boolean;
+  activeTypeFilter?: string,
 }
 
 export class QueryBar extends React.Component<Props, State> {
@@ -43,6 +44,7 @@ export class QueryBar extends React.Component<Props, State> {
     this.handleSuggestSelected = this.handleSuggestSelected.bind(this);
     this.handleDocumentClick = this.handleDocumentClick.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.handleTypeFilterChange = this.handleTypeFilterChange.bind(this);
   }
 
   public componentDidMount() {
@@ -51,6 +53,13 @@ export class QueryBar extends React.Component<Props, State> {
 
   public componentWillUnmount() {
     document.removeEventListener('click', this.handleDocumentClick);
+  }
+
+  componentDidUpdate(prevProps: Props, prevState: State): void {
+    if (prevState.textInput !== this.state.textInput ||
+      prevState.activeTypeFilter !== this.state.activeTypeFilter) {
+        this.loadSuggestions();
+      }
   }
 
   private handleDocumentClick(e: MouseEvent) {
@@ -65,6 +74,7 @@ export class QueryBar extends React.Component<Props, State> {
     }
     this.setState({
       isFocused: false,
+      activeTypeFilter: undefined,
     });
   }
 
@@ -88,12 +98,16 @@ export class QueryBar extends React.Component<Props, State> {
       isFocused: true,      
       textInput
     });
+  }
+
+  private loadSuggestions() {
+    const { textInput, activeTypeFilter} = this.state;
 
     if (textInput.trim() === '') {
       return;
     }
 
-    getSuggestForItems(textInput).then(response => {
+    getSuggestForItems(textInput, activeTypeFilter).then(response => {
       this.setState({
         suggestItems: response.data
       });
@@ -112,9 +126,15 @@ export class QueryBar extends React.Component<Props, State> {
       }
     }
   }
+
+  private handleTypeFilterChange(typeFilter: string) {
+    this.setState({
+      activeTypeFilter: typeFilter
+    });
+  }
   
   render() {
-    const {isFocused, suggestItems, textInput} = this.state;
+    const { isFocused, suggestItems, textInput, activeTypeFilter} = this.state;
 
     return (
       <div className="queryBar" ref={ref => this.elRef = ref}>
@@ -132,7 +152,7 @@ export class QueryBar extends React.Component<Props, State> {
           <ConnectedAuthControl />
         </div>
         {isFocused && textInput ? 
-          <Suggestions items={suggestItems} onSuggestionSelected={this.handleSuggestSelected} />          
+          <Suggestions items={suggestItems} onSuggestionSelected={this.handleSuggestSelected} activeTypeFilter={activeTypeFilter} onTypeFilterChange={this.handleTypeFilterChange} />          
           : null
         }
       </div>

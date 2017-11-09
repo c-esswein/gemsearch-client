@@ -8,37 +8,29 @@ require('./suggestions.scss');
 export interface Props {
   items: SuggestionItem[];
   onSuggestionSelected: (item: SuggestionItem) => void;
-}
-
-interface State {
-    activeTypeFilter?: string,
+  onTypeFilterChange: (filter: string) => void;
+  activeTypeFilter: string,
 }
 
 /**
  * Box with search suggestions.
  */
-export class Suggestions extends React.Component<Props, State> {
+export class Suggestions extends React.Component<Props, {}> {
 
 
   constructor(props: Props) {
     super(props);
-
-    this.state = {};
 
     this.handleFilterClick = this.handleFilterClick.bind(this);
     this.handleItemClick = this.handleItemClick.bind(this);
   }
 
   private handleFilterClick(filter: string) {
-      if (filter === 'all') {
-          this.setState({
-            activeTypeFilter: undefined
-          });
-      } else {
-        this.setState({
-            activeTypeFilter: filter
-        });
-      }
+    if (filter === 'all') {
+        this.props.onTypeFilterChange(undefined);
+    } else {
+        this.props.onTypeFilterChange(filter);
+    }
   }
 
   private handleItemClick(item: SuggestionItem) {
@@ -56,13 +48,7 @@ export class Suggestions extends React.Component<Props, State> {
   }
 
   render() {
-    const {items} = this.props;
-    const {activeTypeFilter} = this.state;    
-
-    let filteredItems = items;
-    if (activeTypeFilter) {
-        filteredItems = items.filter(item => (item.type === activeTypeFilter));
-    }
+    const { items, activeTypeFilter} = this.props;
 
     return (
       <div className="queryBar__suggestions">
@@ -71,12 +57,12 @@ export class Suggestions extends React.Component<Props, State> {
             {filterItemTypes.map(filter => this.renderFilter(filter, filter === activeTypeFilter))}
         </div>
         <div className="queryBar__suggestions-items">
-            {filteredItems.length === 0 ? 
+            {items.length === 0 ? 
                 <div className="queryBar__suggestions-noitems">
                     no results found
                 </div>
             : null}
-            {filteredItems.map(item => (
+            {items.map(item => (
                 <QueryItem key={item.id} item={item} mode="item_select" onActionClick={this.handleItemClick} />                
             ))}
         </div>

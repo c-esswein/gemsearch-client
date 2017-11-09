@@ -38,7 +38,8 @@
 .queryBar__suggestions-items {
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: -1.5em;    
+    margin-bottom: -1.5em;  
+    align-self: flex-start;  
     
     .queryBar__item {
         cursor: pointer;

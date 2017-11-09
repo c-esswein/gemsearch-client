@@ -88,8 +88,15 @@ export function queryGraphItemsAround(vec: Position3D, typeFilter: string[], lim
 /**
  * Get suggestions of items to autocomplete term.
  */
-export function getSuggestForItems(searchTerm: string): Promise<{data: SuggestionItem[]}> {
-    return serverFetch('/api/suggest/' + searchTerm.trim());
+export function getSuggestForItems(searchTerm: string, typeFilter?: string): Promise<{data: SuggestionItem[]}> {
+    const urlParam = encodeURIComponent(searchTerm.trim());
+    const params: {typeFilter?: string} = {};
+
+    if (typeFilter) {
+        params.typeFilter = typeFilter;
+    }
+
+    return serverFetch('/api/suggest/' + urlParam, params);
 }
 
 /**

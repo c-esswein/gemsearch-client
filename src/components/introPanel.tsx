@@ -9,7 +9,6 @@ export interface Props {
 
 export class IntroPanel extends React.Component<Props, null> {
 
-
   render() {
 
     return (
@@ -24,7 +23,7 @@ export class IntroPanel extends React.Component<Props, null> {
           <div className="introPanel__item">
             <div className="introPanel__item-text">
               <h2 className="introPanel__item-hd">Search</h2>
-              <p>Search for songs, artists or #tags to find tracks. Don't forget to combine them.</p>
+              <p>Search for similar music based on seeding elements like tracks, artists or #tags. Don't forget to combine them.</p>
             </div>
           </div>
 
