@@ -147,7 +147,7 @@ export class QueryBar extends React.Component<Props, State> {
           </div>
           <input type="text" className="queryBar__input" 
             onChange={this.handleTextInputChange} onKeyDown={this.handleKeyDown as any}
-            value={textInput} placeholder="Search..." />
+            value={textInput} placeholder="Add item to search..." />
 
           <ConnectedAuthControl />
         </div>

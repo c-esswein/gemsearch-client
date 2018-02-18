@@ -36,8 +36,8 @@ interface State {
   result: QueryServerResult | null;  
 }
 
-const DEBUG = true;
-const ITEMS_PER_REQUEST = 100;
+const DEBUG = false;
+const ITEMS_PER_REQUEST = LAYOUT_CONFIG.itemsPerRequest;
 
 /**
  * Three.js Graph visualization.
@@ -55,9 +55,6 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
 
   /** Mouse position before cluster was expanded */
   private cameraPosBeforeCluster: THREE.Vector3;
-
-  /** scale fac for positions if a cluster is active */
-  private clusterScale = 2;
 
   private page = -1;
 
@@ -232,6 +229,20 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
 
     });
 
+    // remove old items
+    while (this.intersectionMeshes.length > LAYOUT_CONFIG.maxItemsInScene) {
+      const objToRemove = this.intersectionMeshes.shift();
+      const objId = objToRemove.name;
+
+      if (objId.startsWith('cluster_')) {
+        const cluster = this.clusters.get(objId);
+        this.scene.remove(cluster.getSceneObj().sceneObj);
+      } else {
+        const item = this.items.find(item => item.model.id === objId);
+        this.scene.remove(item.getSceneObj().sceneObj);
+      }
+    }
+
     this.startAnimating();    
   }
   
@@ -299,7 +310,6 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
     // get camera center and load more items there
     const centerPos = this.getCameraLookAt();
     centerPos.multiplyScalar(1 / LAYOUT_CONFIG.scalingFac);
-    console.log(centerPos);
     this.loadMoreItems(centerPos);
   }
 
@@ -384,14 +394,14 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
 
     // hide all elements and scale positions
     this.items.forEach(item => {
-      item.setOpacity(0.2);
-      item.scalePosition(this.clusterScale);
+      item.setOpacity(0.1);
+      item.scalePosition(LAYOUT_CONFIG.clusterScale);
     });
     this.clusters.forEach(cluster => {
       if (cluster !== nextCluster) {
-        cluster.setOpacity(0.2);
+        cluster.setOpacity(0.1);
       }
-      cluster.scalePosition(this.clusterScale);
+      cluster.scalePosition(LAYOUT_CONFIG.clusterScale);
     });
 
     this.setState({activeClusterId: nextCluster.name});
@@ -413,11 +423,11 @@ export class DetailGraph extends ThreeScene<Props, State & ThreeSceneState> {
     // show all elements
     this.items.forEach(item => {
       item.setOpacity(1);
-      item.scalePosition(1/this.clusterScale);
+      item.scalePosition(1/LAYOUT_CONFIG.clusterScale);
     });
     this.clusters.forEach(cluster => {
       cluster.setOpacity(1);
-      cluster.scalePosition(1/this.clusterScale);
+      cluster.scalePosition(1/LAYOUT_CONFIG.clusterScale);
     });
 
     this.setState({activeClusterId: null});

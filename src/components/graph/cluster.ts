@@ -30,19 +30,30 @@ export class Cluster {
    * Returns THREE render object group.
    */
   public getSceneObj() {
-    const position = this.model.center;
+    if (!this.itemGroup) {
+      this.render();
+    }
     
+    return {
+      sceneObj: this.itemGroup, 
+      intersectionMesh: this.bgMesh
+    };
+  }
+
+  private render() {
+    const position = this.model.center;
+
     // create group to hold all item elements
     const itemGroup = new THREE.Group();
     itemGroup.position.fromArray(position);
     itemGroup.position.multiplyScalar(LAYOUT_CONFIG.scalingFac);
     itemGroup.name = this.name;
-    
+
     // ---- create background circle element ----
     const bgGeometry = new THREE.CircleGeometry(5.2, LAYOUT_CONFIG.itemRadiusSegments);
     const bgMaterial = new THREE.MeshBasicMaterial({
       color: '#E89F0C',
-      transparent: true,      
+      transparent: true,
     });
     const bgMesh = new THREE.Mesh(bgGeometry, bgMaterial);
     bgMesh.name = this.name; // set name to identify object when using the raycaster
@@ -51,11 +62,6 @@ export class Cluster {
 
     this.bgMesh = bgMesh;
     this.itemGroup = itemGroup;
-    
-    return {
-      sceneObj: itemGroup, 
-      intersectionMesh: bgMesh
-    };
   }
 
   /**

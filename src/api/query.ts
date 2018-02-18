@@ -71,7 +71,7 @@ export function queryGraphItemsAround(vec: Position3D, typeFilter: string[], lim
     const params = {
         'vec': vec.join(','),
         'types': typeFilter.join('|'),
-        'minClusterDistance': 0.1,
+        'minClusterDistance': 0.01,
         'limit': limit,
         'offset': offset,
         'user': dbUser ? dbUser.userName : undefined,
